@@ -6,8 +6,10 @@ import { getSupplier } from "../../crud/super/supplier.crud";
 import FuzzySearch from 'fuzzy-search';
 import { PaymentModal } from './PaymentModal';
 import { ClickModal } from './ClickModal';
+import { EditSuppplier } from './EditSuppplier';
 import PaymentIcon from '@material-ui/icons/Payment';
 import MouseIcon from '@material-ui/icons/Mouse';
+import EditIcon from '@material-ui/icons/Edit';
 
 export default function Clients() {
     const [searcherApproved, setSearcherApproved] = useState(null);
@@ -15,6 +17,7 @@ export default function Clients() {
     const [dataToApprovedDisplay, setDataApprovedDisplay] = useState([]);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showClickModal, setShowClickModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const [clientsLocationReq, refetch] = AxioHook(getSupplier())
 
@@ -41,6 +44,10 @@ export default function Clients() {
             cell: (r) => `${r.costPerClick}$`
         },
         {
+            name: 'Credits',
+            selector: 'credits',
+        },
+        {
             name: 'Created at',
             selector: 'createdAt'
         },
@@ -48,7 +55,6 @@ export default function Clients() {
             name: 'Transaction',
             cell: (r) => {
                 return <PaymentIcon onClick={() => {
-                    console.log('a')
                     setShowPaymentModal(r);
                 }}/>
             },
@@ -57,8 +63,15 @@ export default function Clients() {
             name: 'Clicks',
             cell: (r) => {
                 return <MouseIcon onClick={() => {
-                    console.log('a')
                     setShowClickModal(r);
+                }}/>
+            },
+        },
+        {
+            name: 'Edit',
+            cell: (r) => {
+                return <EditIcon onClick={() => {
+                    setShowEditModal(r);
                 }}/>
             },
         }
@@ -94,6 +107,10 @@ export default function Clients() {
             {BodyApproved}
             {showPaymentModal && <PaymentModal user={showPaymentModal} handleClose={() => setShowPaymentModal(false)} />}
             {showClickModal && <ClickModal  user={showClickModal} handleClose={() => setShowClickModal(false)} />}
+            {showEditModal && <EditSuppplier  user={showEditModal} handleClose={() => {
+                setShowEditModal(false)
+                refetch();
+            }} />}
         </>
     );
 }

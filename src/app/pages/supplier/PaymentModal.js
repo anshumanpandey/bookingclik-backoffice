@@ -17,9 +17,10 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
     return (
         <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
             <Modal.Header closeButton>
-                <Modal.Title>{iataCode ? `Edit ${iataCode.iataCode}` : "Create Location"}</Modal.Title>
+                <Modal.Title>Payments</Modal.Title>
             </Modal.Header>
             <DataTable
+                noHeader={true}
                 subHeaderAlign="center"
                 columns={[
                     {

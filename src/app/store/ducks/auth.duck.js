@@ -35,6 +35,8 @@ export const reducer = persistReducer(
 
         case actionTypes.Logout: {
           routerHelpers.forgotLastLocation();
+          localStorage.removeItem("demo1-lastLocation");
+          localStorage.removeItem("persist:build-demo1");
           return initialAuthState;
         }
 

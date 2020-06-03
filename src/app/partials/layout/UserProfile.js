@@ -105,26 +105,6 @@ const UserProfile = (props) => {
 
               </>
             )}
-            {user.type == "company" && (
-              <>
-                <Link to={`/payment`} onClick={() => setForceShow(false)}>
-
-                  <a className="kt-notification__item">
-                    <div className="kt-notification__item-icon">
-                      <i className="flaticon2-hourglass kt-font-brand" />
-                    </div>
-                    <div className="kt-notification__item-details">
-                      <div className="kt-notification__item-title kt-font-bold">
-                        My Payments
-                </div>
-                      <div className="kt-notification__item-time">
-                        Payments made
-                </div>
-                    </div>
-                  </a>
-                </Link>
-              </>
-            )}
             <div className="kt-notification__custom">
               <Link
                 to="/logout"

@@ -6,6 +6,7 @@ import { getPayments } from "../../crud/pay.crud";
 import FuzzySearch from 'fuzzy-search';
 import XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { AddCreditsModal } from "./AddCreditsModal";
 
 export default function Clients() {
     const [searcherApproved, setSearcherApproved] = useState(null);
@@ -66,6 +67,7 @@ export default function Clients() {
     return (
         <>
             {BodyApproved}
+            {displayModal && <AddCreditsModal refetch={refetch} handleClose={() => setDisplayModal(false)} />}
         </>
     );
 }

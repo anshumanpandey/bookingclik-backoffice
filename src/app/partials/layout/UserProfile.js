@@ -19,13 +19,8 @@ const UserProfile = (props) => {
 
   let prefix = null
 
-  if (user.client && user.client.type == "BROKER") {
-    prefix = `Account # - GRC1200${(() => {
-      const id = user.client.id.toString();
-      if (id.length == 1) return id.padStart(3, "0");
-      if (id.length == 2) return id.padStart(2, "0");
-      if (id.length > 2) return id;
-    })()}`
+  if (user && user.type == "company") {
+    prefix = `Credits ${user.credits}`
   }
 
   return (

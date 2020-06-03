@@ -7,9 +7,11 @@ import AxioHook from 'axios-hooks'
 import { connect } from "react-redux";
 import { Modal } from "react-bootstrap";
 import { PayPalButton } from "react-paypal-button-v2";
+import * as auth from '../../store/ducks/auth.duck';
+import { getUserByToken } from "../../crud/auth.crud";
 
 
-const CreateLocationComponent = ({ handleClose, iataCode, refetch, intl, broker }) => {
+const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser }) => {
     const [amount, setAmount] = useState(0);
     const [payReq, doReport] = AxioHook(reportPayment(), { manual: true })
 
@@ -32,9 +34,13 @@ const CreateLocationComponent = ({ handleClose, iataCode, refetch, intl, broker 
                         label="Amount to add"
                         name="iataCode"
                         onChange={(e) => {
-                            const amount = new Decimal(e.target.value)
-                            if (amount.isNaN() == false) {
-                                setAmount(e.target.value)
+                            if (e.target.value == "") {
+                                setAmount(0)
+                            } else {
+                                const amount = new Decimal(e.target.value)
+                                if (amount.isNaN() == false) {
+                                    setAmount(e.target.value)
+                                }
                             }
                         }}
                         value={amount}
@@ -43,9 +49,14 @@ const CreateLocationComponent = ({ handleClose, iataCode, refetch, intl, broker 
                 <PayPalButton
                     amount={amount}
                     onSuccess={(details, data) => {
-                        alert("Transaction completed by " + details.payer.name.given_name);
-
-                        doReport({ data: {orderId: data.orderID} });
+                        doReport({ data: {orderId: data.orderID} })
+                        .then(() => {
+                            getUserByToken()
+                            .then((res) => {
+                                fulfillUser(res.data)
+                                handleClose();
+                            })
+                        })
                     }}
                     options={{
                         clientId: "AbBy2EJkKQpvu6zmf9gaySHsC5UK-mFjwqI_zLxaNCS60V4cIDU4mR7o5LsBtIU8KAjrh4yqdzsu3J_N"
@@ -60,5 +71,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, refetch, intl, broker 
 export const AddCreditsModal = injectIntl(
     connect(
         null,
+    auth.actions
     )(CreateLocationComponent)
 );

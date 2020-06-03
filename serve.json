@@ -1,0 +1,15 @@
+{
+  "public": "_site",
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/my/app"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/my/app/**",
+      "destination": "/my/app/index.html"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+export default {
+  header: {
+    self: {},
+    items: []
+  },
+  aside: {
+    self: {},
+    items: [
+      {
+        title: "Transactions",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "transactions",
+        roles: ['company'],
+        desc: 'Map your codes to an IATA code'
+      },
+      {
+        title: "Clicks",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "click",
+        roles: ['company'],
+        desc: 'Map your codes to an IATA code'
+      },
+    ]
+  }
+};

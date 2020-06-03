@@ -147,6 +147,8 @@ class AsideLeft extends React.Component {
       location: { pathname }
     } = this.props;
 
+    menuConfig.aside.items = menuConfig.aside.items.filter((route) => route.roles.find(role => user.type == role))
+
     return (
       <>
         <div

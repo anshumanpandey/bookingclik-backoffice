@@ -22,6 +22,15 @@ export default {
         roles: ['company'],
         desc: 'Map your codes to an IATA code'
       },
+
+      {
+        title: "Suppliers",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "supplier",
+        roles: ['super_admin'],
+        desc: 'Map your codes to an IATA code'
+      },
     ]
   }
 };

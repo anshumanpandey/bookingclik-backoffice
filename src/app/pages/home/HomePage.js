@@ -7,6 +7,7 @@ import Notification from "../../widgets/Notification";
 import { useAppState } from '../AppState';
 import MyClick from "../myClicks/myClick";
 import Payments from "../payments"
+import Supplier from "../supplier"
 
 const GoogleMaterialPage = lazy(() =>
   import("./google-material/GoogleMaterialPage")
@@ -27,10 +28,13 @@ function HomePage({ user, menuConfig }) {
   const routes = [
     {path: "/transactions" , component: Payments},
     {path: "/click" , component: MyClick},
+    {path: "/supplier" , component: Supplier},
   ]
 
   let defaultRoute = 'click';
-
+  if (user.type == 'super_admin') {
+    defaultRoute = 'supplier';
+  }
 
   return (
     <Suspense fallback={<LayoutSplashScreen />}>
@@ -55,7 +59,7 @@ function HomePage({ user, menuConfig }) {
             if (currentRoute.roles.length === 0) return true;
 
             
-            return currentRoute.roles.some(r => user.type = r) 
+            return currentRoute.roles.some(r => user.type == r) 
           })
           .filter((r) => {
             const currentRoute = menuConfig.aside.items.find(i => i.page === r.path.replace(/\//g, ''))
@@ -64,7 +68,7 @@ function HomePage({ user, menuConfig }) {
             if (!currentRoute.roles) return true;
             if (currentRoute.roles.length === 0) return true;
 
-            return currentRoute.roles.some(r => user.type = r)
+            return currentRoute.roles.some(r => user.type == r)
           })
           .map(r => <Route key={r.path} path={r.path} component={r.component} />)}        
         {/*<Redirect to="/error/error-v1" />*/}

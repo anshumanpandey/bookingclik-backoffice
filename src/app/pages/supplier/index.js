@@ -6,6 +6,7 @@ import { getSupplier } from "../../crud/super/supplier.crud";
 import FuzzySearch from 'fuzzy-search';
 import { PaymentModal } from './PaymentModal';
 import { ClickModal } from './ClickModal';
+import { CreateUserModal } from './CreateUserModal';
 import { EditSuppplier } from './EditSuppplier';
 import PaymentIcon from '@material-ui/icons/Payment';
 import MouseIcon from '@material-ui/icons/Mouse';
@@ -18,6 +19,7 @@ export default function Clients() {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showClickModal, setShowClickModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     const [clientsLocationReq, refetch] = AxioHook(getSupplier())
 
@@ -89,6 +91,9 @@ export default function Clients() {
                     <Input type="text" onChange={(e) => {
                         if (searcherApproved) setDataApprovedDisplay(searcherApproved.search(e.target.value))
                     }} />
+                    <Button variant="contained" color="primary" onClick={() => {
+                        setShowCreateModal(true);
+                    }}>Create</Button>
                 </>
             }
             data={dataToApprovedDisplay}
@@ -105,11 +110,15 @@ export default function Clients() {
     return (
         <>
             {BodyApproved}
+            {showCreateModal && <CreateUserModal user={showPaymentModal} handleClose={(reason) => {
+                setShowCreateModal(false)
+                if (reason == 'created') refetch();
+            }} />}
             {showPaymentModal && <PaymentModal user={showPaymentModal} handleClose={() => setShowPaymentModal(false)} />}
             {showClickModal && <ClickModal  user={showClickModal} handleClose={() => setShowClickModal(false)} />}
-            {showEditModal && <EditSuppplier  user={showEditModal} handleClose={() => {
+            {showEditModal && <EditSuppplier  user={showEditModal} handleClose={(reason) => {
                 setShowEditModal(false)
-                refetch();
+                if (reason == 'edited') refetch();
             }} />}
         </>
     );

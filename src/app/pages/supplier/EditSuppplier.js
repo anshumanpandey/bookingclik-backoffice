@@ -26,7 +26,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
           doUpdate({ data: { ...values, supplierId: user.id } })
             .then(() => {
               setSubmitting(false)
-              handleClose('hide');
+              handleClose('edited');
             })
             .catch(() => handleClose())
         }}

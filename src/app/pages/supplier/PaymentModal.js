@@ -27,7 +27,10 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                         name: 'Order ID',
                         selector: 'id',
                     },
-
+                    {
+                        name: 'Amount',
+                        selector: 'amount',
+                    },
                     {
                         name: 'Created At',
                         selector: 'createdAt',

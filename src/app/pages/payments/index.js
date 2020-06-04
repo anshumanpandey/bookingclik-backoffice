@@ -4,8 +4,7 @@ import AxioHook from 'axios-hooks'
 import DataTable from 'react-data-table-component';
 import { getPayments } from "../../crud/pay.crud";
 import FuzzySearch from 'fuzzy-search';
-import XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+import { parse, format } from 'date-fns';
 import { AddCreditsModal } from "./AddCreditsModal";
 
 export default function Clients() {
@@ -16,7 +15,7 @@ export default function Clients() {
 
     const [clientsLocationReq, refetch] = AxioHook(getPayments())
 
-    const fieldsToFilterFor = ['country']
+    const fieldsToFilterFor = ['orderId']
     useEffect(() => {
         if (clientsLocationReq.data) {
 
@@ -31,8 +30,13 @@ export default function Clients() {
             selector: 'orderId',
         },
         {
+            name: 'Amount',
+            selector: 'amount',
+        },
+        {
             name: 'Created at',
-            selector: 'createdAt'
+            selector: 'createdAt',
+            //2020-06-03T05:29:26.000Z
         }
     ];
 
@@ -45,12 +49,12 @@ export default function Clients() {
             pagination={true}
             actions={
                 <>
-                    <Button variant="contained" color="primary" onClick={() => {
-                        setDisplayModal(true);
-                    }}>Add founds</Button>
-                    <Input type="text" onChange={(e) => {
+                    <Input type="text" inputProps={{ placehoder: "Search by TransactionID" }} onChange={(e) => {
                         if (searcherApproved) setDataApprovedDisplay(searcherApproved.search(e.target.value))
                     }} />
+                    <Button variant="contained" color="primary" onClick={() => {
+                        setDisplayModal(true);
+                    }}>Add Funds</Button>
                 </>
             }
             data={dataToApprovedDisplay}
@@ -67,7 +71,10 @@ export default function Clients() {
     return (
         <>
             {BodyApproved}
-            {displayModal && <AddCreditsModal refetch={refetch} handleClose={() => setDisplayModal(false)} />}
+            {displayModal && <AddCreditsModal refetch={refetch} handleClose={(reason) => {
+                setDisplayModal(false)
+                if (reason == 'PAY') refetch();
+            }} />}
         </>
     );
 }

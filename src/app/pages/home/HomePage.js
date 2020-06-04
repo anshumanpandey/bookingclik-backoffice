@@ -8,6 +8,7 @@ import { useAppState } from '../AppState';
 import MyClick from "../myClicks/myClick";
 import Payments from "../payments"
 import Supplier from "../supplier"
+import BlacklistedCompanies from "../blacklistedCompanies"
 
 const GoogleMaterialPage = lazy(() =>
   import("./google-material/GoogleMaterialPage")
@@ -29,6 +30,7 @@ function HomePage({ user, menuConfig }) {
     {path: "/transactions" , component: Payments},
     {path: "/click" , component: MyClick},
     {path: "/supplier" , component: Supplier},
+    {path: "/blacklist" , component: BlacklistedCompanies},
   ]
 
   let defaultRoute = 'click';

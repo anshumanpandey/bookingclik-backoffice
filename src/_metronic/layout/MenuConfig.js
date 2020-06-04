@@ -11,7 +11,7 @@ export default {
         root: true,
         icon: "flaticon2-architecture-and-city",
         page: "transactions",
-        roles: ['company'],
+        roles: ['broker', 'supplier'],
         desc: 'Map your codes to an IATA code'
       },
       {
@@ -19,7 +19,7 @@ export default {
         root: true,
         icon: "flaticon2-architecture-and-city",
         page: "click",
-        roles: ['company'],
+        roles: ['broker', 'supplier'],
         desc: 'Map your codes to an IATA code'
       },
 

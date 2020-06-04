@@ -31,16 +31,16 @@ export default function AuthPage() {
               </div>
               <div className="kt-grid__item kt-grid__item--fluid kt-grid kt-grid--ver">
                 <div className="kt-grid__item kt-grid__item--middle">
-                  <h3 className="kt-login__title">Welcome to Car Rental Back Office!</h3>
+                  <h3 className="kt-login__title">Welcome to Booking!</h3>
                   <h4 className="kt-login__subtitle">
-                    The admin application for Car Rental Back Office!
+                    The admin application for Booking!
                   </h4>
                 </div>
               </div>
               <div className="kt-grid__item">
                 <div className="kt-login__info">
                   <div className="kt-login__copyright">
-                    &copy; 2020 Car Rental Back Office
+                    &copy; 2020 Copyright BookingClik Limited
                   </div>
                   <div className="kt-login__menu">
                     <Link to="/terms" className="kt-link">
@@ -59,14 +59,14 @@ export default function AuthPage() {
 
             <div className="kt-grid__item kt-grid__item--fluid  kt-grid__item--order-tablet-and-mobile-1  kt-login__wrapper">
               <Switch>
-                <Route path="/auth/login" component={Login} />
+                <Route path="/" component={Login} />
                 <Route path="/auth/registration" component={Registration} />
                 <Route
                   path="/auth/forgot-password"
                   component={ForgotPassword}
                 />
-                <Redirect from="/auth" exact={true} to="/auth/login" />
-                <Redirect to="/auth/login" />
+                <Redirect from="/auth" exact={true} to="/" />
+                <Redirect to="/" />
               </Switch>
             </div>
           </div>

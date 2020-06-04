@@ -14,7 +14,7 @@ class Footer extends React.Component {
         <div className={`kt-container ${this.props.footerContainerClasses}`}>
           <div className="kt-footer__copyright">
             {today.toString()}&nbsp;&copy;&nbsp;
-            GRCGDS
+            Copyright BookingClik Limited
           </div>
         </div>
       </div>

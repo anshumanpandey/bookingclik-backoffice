@@ -47,7 +47,7 @@ function HomePage({ user, menuConfig }) {
       <Switch>
         {
           /* Redirect from root URL to /clients. */
-          <Redirect exact from="/" to={`/${defaultRoute}`} />
+          <Redirect exact from="/dashboard" to={`/${defaultRoute}`} />
         }
         {
           routes

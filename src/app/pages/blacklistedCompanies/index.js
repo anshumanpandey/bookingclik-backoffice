@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button } from '@material-ui/core';
-import AxioHook from 'axios-hooks'
+import axios from 'axios'
+import AxioHook, { makeUseAxios } from 'axios-hooks'
 import DataTable from 'react-data-table-component';
 import { getBlacklistedCompanies, deleteBlacklistedCompanies } from "../../crud/super/blacklist.crud";
 import { AddCompanies } from "./AddCompany";
@@ -9,6 +10,10 @@ import FuzzySearch from 'fuzzy-search';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 
+const normalUseAxios = makeUseAxios({
+    axios: axios.create()
+});
+
 export default function Clients() {
     const [searcherApproved, setSearcherApproved] = useState(null);
 
@@ -16,7 +21,7 @@ export default function Clients() {
     const [showModal, setShowModal] = useState(false);
     const [showEdit, setShowEdit] = useState(false);
 
-    const [companiesReq, refetch] = AxioHook(getBlacklistedCompanies())
+    const [companiesReq, refetch] = normalUseAxios(getBlacklistedCompanies())
     const [deleteReq, doDelete] = AxioHook(deleteBlacklistedCompanies(), { manual: true })
 
     const fieldsToFilterFor = ['email']
@@ -79,7 +84,7 @@ export default function Clients() {
         BodyApproved = (<h3>Error fetching the resource</h3>);
     }
 
-
+console.log(companiesReq)   
 
     return (
         <>

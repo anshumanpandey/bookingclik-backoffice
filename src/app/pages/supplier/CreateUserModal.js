@@ -7,7 +7,15 @@ import AxioHook from 'axios-hooks'
 import { connect } from "react-redux";
 import { Modal } from "react-bootstrap";
 import * as auth from '../../store/ducks/auth.duck';
+var ValidatePassword = require('validate-password');
 
+var validator = new ValidatePassword({
+  enforce: {
+    lowercase: true,
+    uppercase: true,
+    numbers: true
+  }
+});
 
 const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
   const [clientsLocationReq, doUpdate] = AxioHook(createSupplier(), { manual: true })
@@ -34,6 +42,27 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
           if (!values.password) errors.password = 'Missing password';
           if (!values.confirmPassword) errors.confirmPassword = 'Missing confirmPassword';
           if (values.password !== values.confirmPassword) errors.password = 'Password and confirm password not match';
+
+          if (values.password || values.confirmPassword) {
+            if (values.password != values.confirmPassword){
+              errors.password = "Password not match"
+              errors.confirmPassword = "Password not match"
+            }
+
+            if (values.password.length < 4) errors.password = "Password too short"
+            const validation = validator.checkPassword(values.password)
+            if (!validation.isValid) errors.password = validation.validationMessage
+            if (values.password.length < 4) errors.password = "Password too short"
+
+            const validation2 = validator.checkPassword(values.confirmPassword)
+            if (!values.confirmPassword) {
+              errors.confirmPassword = 'Required'
+            } else if (!validation2.isValid) {
+              errors.confirmPassword = validation2.validationMessage
+            }
+            if (values.confirmPassword.length < 4) errors.confirmPassword = "Password too short"
+
+          }
 
           return errors;
         }}
@@ -88,7 +117,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
 
               <div className="form-group">
                 <TextField
-                  type="string"
+                  type="password"
                   label="Password"
                   margin="normal"
                   className="kt-width-full"
@@ -103,7 +132,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
 
               <div className="form-group">
                 <TextField
-                  type="string"
+                  type="password"
                   label="Confirm Password"
                   margin="normal"
                   className="kt-width-full"

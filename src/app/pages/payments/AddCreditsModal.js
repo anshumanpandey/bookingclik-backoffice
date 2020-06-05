@@ -14,8 +14,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
     const [amount, setAmount] = useState(0);
     const [payReq, doReport] = AxioHook(reportPayment(), { manual: true })
 
-    console.log(user)
-
     let currency = 'USD';
     if (user.currency == '€') currency = 'EUR'
     if (user.currency == '£') currency = 'GBP'
@@ -78,7 +76,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                         onSuccess={(details, data) => {
                             doReport({ data: { orderId: data.orderID } })
                                 .then(() => {
-                                    console.log('payment done')
                                     getUserByToken()
                                         .then((res) => {
                                             fulfillUser(res.data)

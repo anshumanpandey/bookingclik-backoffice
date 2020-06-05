@@ -7,6 +7,15 @@ import AxioHook from 'axios-hooks'
 import { connect } from "react-redux";
 import { Modal } from "react-bootstrap";
 import * as auth from '../../store/ducks/auth.duck';
+var ValidatePassword = require('validate-password');
+
+var validator = new ValidatePassword({
+  enforce: {
+    lowercase: true,
+    uppercase: true,
+    numbers: true
+  }
+});
 
 
 const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
@@ -21,6 +30,37 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
       </Modal.Header>
       <Formik
         initialValues={user}
+        validate={(values) => {
+          const errors = {}
+          if (!values.email) errors.email = 'Required'
+          if (!values.currencySymbol) errors.currencySymbol = 'Required'
+          if (!values.costPerClick) errors.costPerClick = 'Required'
+          if (!values.companyName) errors.companyName = 'Required'
+          if (!values.credits) errors.credits = 'Required'
+
+          if (values.password || values.confirmPassword) {
+            if (values.password != values.confirmPassword){
+              errors.password = "Password not match"
+              errors.confirmPassword = "Password not match"
+            }
+
+            if (values.password.length < 4) errors.password = "Password too short"
+            const validation = validator.checkPassword(values.password)
+            if (!validation.isValid) errors.password = validation.validationMessage
+            if (values.password.length < 4) errors.password = "Password too short"
+
+            const validation2 = validator.checkPassword(values.confirmPassword)
+            if (!values.confirmPassword) {
+              errors.confirmPassword = 'Required'
+            } else if (!validation2.isValid) {
+              errors.confirmPassword = validation2.validationMessage
+            }
+            if (values.confirmPassword.length < 4) errors.confirmPassword = "Password too short"
+
+          }
+
+          return errors;
+        }}
         onSubmit={(values, { setStatus, setSubmitting }) => {
           setStatus(null);
           setSubmitting(true)
@@ -42,7 +82,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
           handleBlur,
           handleSubmit,
           isSubmitting,
-          setFieldValue
         }) => (
             <form
               style={{ padding: '2rem' }}
@@ -60,21 +99,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
               <div className="form-group">
                 <TextField
                   type="string"
-                  label="Cost Per Click"
-                  margin="normal"
-                  className="kt-width-full"
-                  name="costPerClick"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.costPerClick}
-                  helperText={touched.costPerClick && errors.costPerClick}
-                  error={Boolean(touched.costPerClick && errors.costPerClick)}
-                />
-              </div>
-
-              <div className="form-group">
-                <TextField
-                  type="string"
                   label="Email"
                   margin="normal"
                   className="kt-width-full"
@@ -85,6 +109,65 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   helperText={touched.email && errors.email}
                   error={Boolean(touched.email && errors.email)}
                 />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="password"
+                  label="Password"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="password"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.password}
+                  helperText={touched.password && errors.password}
+                  error={Boolean(touched.password && errors.password)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="password"
+                  label="Confirm Password"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="confirmPassword"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.confirmPassword}
+                  helperText={touched.confirmPassword && errors.confirmPassword}
+                  error={Boolean(touched.confirmPassword && errors.confirmPassword)}
+                />
+              </div>
+
+              <div>
+                <div className="form-group" style={{ display: 'flex' }}>
+                  <Select
+                    style={{ marginRight: '1rem' }}
+                    label="Currency Symbol"
+                    name="currencySymbol"
+                    value={values.currencySymbol}
+                    onChange={handleChange}
+                  >
+                    <MenuItem value={"$"}>$</MenuItem>
+                    <MenuItem value={"£"}>£</MenuItem>
+                    <MenuItem value={"€"}>€</MenuItem>
+                  </Select>
+                  <TextField
+                    style={{ marginTop: 'auto', marginBottom: 'auto' }}
+                    type="string"
+                    label="Cost Per Click"
+                    margin="normal"
+                    className="kt-width-full"
+                    name="costPerClick"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.costPerClick}
+                    helperText={touched.costPerClick && errors.costPerClick}
+                    error={Boolean(touched.costPerClick && errors.costPerClick)}
+                  />
+                </div>
               </div>
 
               <div className="form-group">
@@ -116,20 +199,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   helperText={touched.credits && errors.credits}
                   error={Boolean(touched.credits && errors.credits)}
                 />
-              </div>
-
-              <div className="form-group">
-                <Select
-                  label="Currency Symbol"
-                  fullWidth
-                  name="currencySymbol"
-                  value={values.currencySymbol}
-                  onChange={handleChange}
-                >
-                  <MenuItem value={"$"}>$</MenuItem>
-                  <MenuItem value={"£"}>£</MenuItem>
-                  <MenuItem value={"€"}>€</MenuItem>
-                </Select>
               </div>
 
               <div className="kt-login__actions">

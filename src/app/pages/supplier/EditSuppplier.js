@@ -41,7 +41,8 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
           handleChange,
           handleBlur,
           handleSubmit,
-          isSubmitting
+          isSubmitting,
+          setFieldValue
         }) => (
             <form
               style={{ padding: '2rem' }}
@@ -68,6 +69,36 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   value={values.costPerClick}
                   helperText={touched.costPerClick && errors.costPerClick}
                   error={Boolean(touched.costPerClick && errors.costPerClick)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="Email"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.email}
+                  helperText={touched.email && errors.email}
+                  error={Boolean(touched.email && errors.email)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="Adress"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="address"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.address}
+                  helperText={touched.address && errors.address}
+                  error={Boolean(touched.address && errors.address)}
                 />
               </div>
 

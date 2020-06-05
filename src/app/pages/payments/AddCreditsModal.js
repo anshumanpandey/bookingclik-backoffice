@@ -8,7 +8,7 @@ import { connect } from "react-redux";
 import { Modal } from "react-bootstrap";
 import { PayPalButton } from "react-paypal-button-v2";
 import { getUserByToken } from "../../crud/auth.crud";
-
+import * as auth from "../../store/ducks/auth.duck";
 
 const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) => {
     const [amount, setAmount] = useState(0);
@@ -53,9 +53,13 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                             if (e.target.value == "") {
                                 setAmount(0)
                             } else {
-                                const amount = new Decimal(e.target.value)
-                                if (amount.isNaN() == false) {
-                                    setAmount(amount.floor().toString())
+                                try{
+                                    const amount = new Decimal(e.target.value)
+                                    if (amount.isNaN() == false) {
+                                        setAmount(amount.floor().toString())
+                                    }
+                                } catch(err) {
+
                                 }
                             }
                         }}
@@ -74,6 +78,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                         onSuccess={(details, data) => {
                             doReport({ data: { orderId: data.orderID } })
                                 .then(() => {
+                                    console.log('payment done')
                                     getUserByToken()
                                         .then((res) => {
                                             fulfillUser(res.data)
@@ -92,8 +97,8 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
     );
 }
 
-const mapStateToProps = ({ auth: { user }, builder }) => ({
-    user,
-});
 
-export const AddCreditsModal = connect(mapStateToProps)(CreateLocationComponent);
+export const AddCreditsModal = connect(
+    ({ auth }) => ({ user: auth.user }),
+    auth.actions
+)(CreateLocationComponent);

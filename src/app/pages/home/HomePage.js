@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from "react";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { Redirect, Route, Switch } from "react-router-dom";
 import Builder from "./Builder";
@@ -28,6 +28,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
 
   const [success, setSuccess] = useAppState('success');
   const [error, setError] = useAppState('error');
+  const [showError, setShowError] = useState(true);
 
   const routes = [
     { path: "/transactions", component: Payments },
@@ -44,7 +45,6 @@ function HomePage({ user, menuConfig, fulfillUser }) {
   useEffect(() => {
     getUserByToken()
       .then((res) => {
-        console.log(fulfillUser)
         fulfillUser(res.data)
       })
   }, [])
@@ -56,6 +56,12 @@ function HomePage({ user, menuConfig, fulfillUser }) {
       )}
       {error && (
         <Notification msg={error} onClose={() => setError(false)} severity={'error'} />
+      )}
+      {user.credits < 10 && showError && (
+        <div role="alert" className="alert alert-danger">
+          <div className="alert-text">{"You are runnig out of credits"}</div>
+          <p style={{ margin: 0 }} onClick={() => setShowError(false)}>X</p>
+        </div>
       )}
       <Switch>
         {

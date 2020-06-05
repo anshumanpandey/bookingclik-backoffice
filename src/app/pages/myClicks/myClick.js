@@ -120,17 +120,17 @@ export default function Clients() {
     }
 
 
-
     let BodyApproved = (
         <DataTable
             data={dataToApprovedDisplay.filter(i => moment(i.created_at).isBetween(dates[0], dates[1]))}
-            subHeader={
-                <>
-                Total of ${clientsLocationReq.data?.length} clicks
-                </>
+            subHeader={true}
+            subHeaderComponent={
+                <h5>
+                Total of {dataToApprovedDisplay.filter(i => moment(i.created_at).isBetween(dates[0], dates[1]))?.length} clicks
+                </h5>
             }
+            subHeaderAlign="left"
             progressPending={clientsLocationReq.loading}
-            subHeaderAlign="center"
             columns={columns}
             pagination={true}
             actions={

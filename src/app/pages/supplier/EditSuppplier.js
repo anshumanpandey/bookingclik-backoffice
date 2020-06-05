@@ -84,57 +84,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                 />
               </div>
 
-              <FieldArray
-                name="BlacklistedCompanies"
-                render={arrayHelpers => (
-                  <div>
-                    {values.BlacklistedCompanies && values.BlacklistedCompanies.length > 0 ? (
-                      values.BlacklistedCompanies.map((company, index) => {
-                        return (
-                          <div style={{ display: 'flex', flexDirection: 'row' }} key={index}>
-                            <div style={{ width: '100%' }} className="form-group">
-                              <TextField
-                                type="string"
-                                label="Company"
-                                margin="normal"
-                                className="kt-width-full"
-                                name={`blacklistedCompany.${index}`}
-                                onBlur={handleBlur}
-                                onChange={(e) => {
-                                  arrayHelpers.replace(index, {companyName: e.target.value})
-                                }}
-                                value={company.companyName}
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              style={{ alignSelf: 'center' }}
-                              className={`btn btn-primary btn-elevate kt-login__btn-primary`}
-                              onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
-                            >
-                              -
-                        </button>
-                            <button
-                              style={{ alignSelf: 'center' }}
-                              className={`btn btn-primary btn-elevate kt-login__btn-primary`}
-                              type="button"
-                              onClick={() => arrayHelpers.insert(index, '')} // insert an empty string at a position
-                            >
-                              +
-                        </button>
-                          </div>
-                        );
-                      })
-                    ) : (
-                        <button className={`btn btn-primary btn-elevate kt-login__btn-primary`} type="button" onClick={() => arrayHelpers.push('')}>
-                          {/* show this when user has removed all friends from the list */}
-                    Add a Company
-                        </button>
-                      )}
-                  </div>
-                )}
-              />
-
               <div className="kt-login__actions">
                 <button
                   id="kt_login_signin_submit"

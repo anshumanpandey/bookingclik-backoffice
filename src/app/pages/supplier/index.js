@@ -89,7 +89,7 @@ const SupplierComponent = () => {
             pagination={true}
             actions={
                 <>
-                    <Input type="text" onChange={(e) => {
+                    <Input placeholder="Search" type="text" onChange={(e) => {
                         if (searcherApproved) setDataApprovedDisplay(searcherApproved.search(e.target.value))
                     }} />
                     <Button variant="contained" color="primary" onClick={() => {

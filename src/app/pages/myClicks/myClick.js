@@ -136,9 +136,6 @@ export default function Clients() {
             actions={
                 <>
                     <CalendarInput />
-                    <Input type="text" onChange={(e) => {
-                        if (searcherApproved) setDataApprovedDisplay(searcherApproved.search(e.target.value))
-                    }} />
                 </>
             }
         />

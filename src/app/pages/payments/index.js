@@ -49,7 +49,7 @@ export default function Clients() {
             pagination={true}
             actions={
                 <>
-                    <Input type="text" inputProps={{ placehoder: "Search by TransactionID" }} onChange={(e) => {
+                    <Input placeholder="Search For Transaction" type="text" onChange={(e) => {
                         if (searcherApproved) setDataApprovedDisplay(searcherApproved.search(e.target.value))
                     }} />
                     <Button variant="contained" color="primary" onClick={() => {

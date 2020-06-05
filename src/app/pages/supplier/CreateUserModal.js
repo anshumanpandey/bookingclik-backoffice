@@ -132,6 +132,21 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
               </div>
 
               <div className="form-group">
+                <TextField
+                  type="string"
+                  label="Company Name"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="companyName"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.companyName}
+                  helperText={touched.companyName && errors.companyName}
+                  error={Boolean(touched.companyName && errors.companyName)}
+                />
+              </div>
+
+              <div className="form-group">
                 <Select
                   label="Currency Symbol"
                   fullWidth

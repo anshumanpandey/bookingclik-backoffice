@@ -90,15 +90,15 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
               <div className="form-group">
                 <TextField
                   type="string"
-                  label="Adress"
+                  label="Company Name"
                   margin="normal"
                   className="kt-width-full"
-                  name="address"
+                  name="companyName"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.address}
-                  helperText={touched.address && errors.address}
-                  error={Boolean(touched.address && errors.address)}
+                  value={values.companyName}
+                  helperText={touched.companyName && errors.companyName}
+                  error={Boolean(touched.companyName && errors.companyName)}
                 />
               </div>
 

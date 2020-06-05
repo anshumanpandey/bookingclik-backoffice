@@ -1,6 +1,6 @@
 export function getBlacklistedCompanies() {
   return {
-    url: `${process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL : window.location.origin}/super/blacklist`,
+    url: `${process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL : window.location.origin}/public/super/blacklist/all`,
     method: 'GET'
   }
 }

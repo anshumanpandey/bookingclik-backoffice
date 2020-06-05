@@ -4,11 +4,13 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import Builder from "./Builder";
 import { LayoutSplashScreen } from "../../../_metronic";
 import Notification from "../../widgets/Notification";
+import CustomePaypalButton from "../../partials/CustomePaypalButton";
 import { useAppState } from '../AppState';
 import MyClick from "../myClicks/myClick";
 import Payments from "../payments"
 import Supplier from "../supplier"
 import BlacklistedCompanies from "../blacklistedCompanies"
+import { AddCreditsModal } from "../payments/AddCreditsModal"
 import * as auth from "../../store/ducks/auth.duck";
 import { getUserByToken } from "../../crud/auth.crud";
 
@@ -29,6 +31,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
   const [success, setSuccess] = useAppState('success');
   const [error, setError] = useAppState('error');
   const [showError, setShowError] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   const routes = [
     { path: "/transactions", component: Payments },
@@ -59,8 +62,10 @@ function HomePage({ user, menuConfig, fulfillUser }) {
       )}
       {user.credits < 10 && showError && (
         <div role="alert" className="alert alert-danger">
-          <div className="alert-text">{"You are runnig out of credits"}</div>
-          <p style={{ margin: 0 }} onClick={() => setShowError(false)}>X</p>
+          <div className="alert-text">
+            You are running out of clicks. To add more clicks please click <a onClick={() => setShowModal(true)} href="#">here</a>
+          </div>
+          <p style={{ margin: 0, cursor: 'pointer' }} onClick={() => setShowError(false)}>X</p>
         </div>
       )}
       <Switch>
@@ -93,6 +98,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
         {/*<Redirect to="/error/error-v1" />*/}
         <Redirect to="/" />
       </Switch>
+      {showModal && <AddCreditsModal /> }
     </Suspense>
   );
 }

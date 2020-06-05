@@ -4,7 +4,6 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import Builder from "./Builder";
 import { LayoutSplashScreen } from "../../../_metronic";
 import Notification from "../../widgets/Notification";
-import CustomePaypalButton from "../../partials/CustomePaypalButton";
 import { useAppState } from '../AppState';
 import MyClick from "../myClicks/myClick";
 import Payments from "../payments"

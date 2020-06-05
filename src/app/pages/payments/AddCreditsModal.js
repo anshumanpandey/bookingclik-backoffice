@@ -7,9 +7,7 @@ import AxioHook from 'axios-hooks'
 import { connect } from "react-redux";
 import { Modal } from "react-bootstrap";
 import { PayPalButton } from "react-paypal-button-v2";
-import * as auth from '../../store/ducks/auth.duck';
 import { getUserByToken } from "../../crud/auth.crud";
-import { useAppState } from '../AppState';
 
 
 const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) => {
@@ -17,6 +15,10 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
     const [payReq, doReport] = AxioHook(reportPayment(), { manual: true })
 
     console.log(user)
+
+    let currency = 'USD';
+    if (user.currency == '€') currency = 'EUR'
+    if (user.currency == '£') currency = 'GBP'
 
     return (
         <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
@@ -80,7 +82,8 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                                 })
                         }}
                         options={{
-                            clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A"
+                            clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A",
+                            currency
                         }}
                     />
                 </div>

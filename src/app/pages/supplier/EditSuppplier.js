@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, FormControlLabel, Checkbox, Button } from '@material-ui/core';
+import { TextField, Select, MenuItem } from '@material-ui/core';
 import { updateSupplier } from "../../crud/super/supplier.crud";
 import { Formik, FieldArray, Field, Form } from "formik";
 import { injectIntl } from "react-intl";
@@ -11,6 +11,8 @@ import * as auth from '../../store/ducks/auth.duck';
 
 const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
   const [clientsLocationReq, doUpdate] = AxioHook(updateSupplier(), { manual: true })
+
+  console.log(user)
 
   return (
     <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
@@ -82,6 +84,20 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   helperText={touched.credits && errors.credits}
                   error={Boolean(touched.credits && errors.credits)}
                 />
+              </div>
+
+              <div className="form-group">
+                <Select
+                  label="Currency Symbol"
+                  fullWidth
+                  name="currencySymbol"
+                  value={values.currencySymbol}
+                  onChange={handleChange}
+                >
+                  <MenuItem value={"$"}>$</MenuItem>
+                  <MenuItem value={"£"}>£</MenuItem>
+                  <MenuItem value={"€"}>€</MenuItem>
+                </Select>
               </div>
 
               <div className="kt-login__actions">

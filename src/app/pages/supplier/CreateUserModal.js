@@ -25,6 +25,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
           confirmPassword: '',
           costPerClick: 1,
           type: "supplier",
+          currencySymbol: '$'
         }}
         validate={(values) => {
           const errors = {};
@@ -128,6 +129,20 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   helperText={touched.costPerClick && errors.costPerClick}
                   error={Boolean(touched.costPerClick && errors.costPerClick)}
                 />
+              </div>
+
+              <div className="form-group">
+                <Select
+                  label="Currency Symbol"
+                  fullWidth
+                  name="currencySymbol"
+                  value={values.currencySymbol}
+                  onChange={handleChange}
+                >
+                  <MenuItem value={"$"}>$</MenuItem>
+                  <MenuItem value={"£"}>£</MenuItem>
+                  <MenuItem value={"€"}>€</MenuItem>
+                </Select>
               </div>
 
               <div className="form-group">

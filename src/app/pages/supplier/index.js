@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button } from '@material-ui/core';
+import { connect } from "react-redux";
 import AxioHook from 'axios-hooks'
 import DataTable from 'react-data-table-component';
 import { getSupplier } from "../../crud/super/supplier.crud";
@@ -12,7 +13,7 @@ import PaymentIcon from '@material-ui/icons/Payment';
 import MouseIcon from '@material-ui/icons/Mouse';
 import EditIcon from '@material-ui/icons/Edit';
 
-export default function Clients() {
+const SupplierComponent = () => {
     const [searcherApproved, setSearcherApproved] = useState(null);
 
     const [dataToApprovedDisplay, setDataApprovedDisplay] = useState([]);
@@ -43,7 +44,7 @@ export default function Clients() {
         },
         {
             name: 'Price per Click',
-            cell: (r) => `${r.costPerClick}$`
+            cell: (r) => `${r.currencySymbol}${r.costPerClick}`
         },
         {
             name: 'Credits',
@@ -123,3 +124,9 @@ export default function Clients() {
         </>
     );
 }
+
+const mapStateToProps = ({ auth: { user }, builder }) => ({
+    user,
+});
+
+export default connect(mapStateToProps)(SupplierComponent);

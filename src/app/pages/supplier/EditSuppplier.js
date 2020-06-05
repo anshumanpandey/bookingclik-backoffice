@@ -78,6 +78,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   label="Credits"
                   className="kt-width-full"
                   name="credits"
+                  disabled={true}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.credits}

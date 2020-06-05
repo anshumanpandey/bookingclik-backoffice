@@ -9,24 +9,20 @@ import { createBlacklistedCompanies } from "../../crud/super/blacklist.crud";
 
 
 const CreateLocationComponent = ({ handleClose }) => {
-    const [amount, setAmount] = useState(0);
-    const [payReq, doPost] = AxioHook(createBlacklistedCompanies(), { manual: true })
+  const [amount, setAmount] = useState(0);
+  const [payReq, doPost] = AxioHook(createBlacklistedCompanies(), { manual: true })
 
-    return (
-        <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
-            <Modal.Header closeButton>
-                <Modal.Title>Add Funds to your Account</Modal.Title>
-            </Modal.Header>
-            <Formik
-        initialValues={{ companies: [] }}
+  return (
+    <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
+      <Modal.Header closeButton>
+        <Modal.Title>Add Funds to your Account</Modal.Title>
+      </Modal.Header>
+      <Formik
+        initialValues={{ companyName: '' }}
         onSubmit={(values, { setStatus, setSubmitting }) => {
-          setSubmitting(false)
           setStatus(null);
-          const companiesToSend = values.companies.filter(i => i.companyName != '')
-          console.log(companiesToSend)
-          if (companiesToSend.length == 0) return
           setSubmitting(true)
-          doPost({ data: { companies: companiesToSend } })
+          doPost({ data: { company: values } })
             .then(() => {
               setSubmitting(false)
               handleClose('edited');
@@ -57,62 +53,17 @@ const CreateLocationComponent = ({ handleClose }) => {
                 </div>
               ) : null}
 
-              <FieldArray
-                name="companies"
-                render={arrayHelpers => {
-                    if (values.companies && values.companies.length == 0) {
-                        arrayHelpers.push({ companyName: '' })
-                    }
-                    return (
-                        <div>
-                          {values.companies && values.companies.length > 0 ? (
-                            values.companies.map((company, index) => {
-                              return (
-                                <div style={{ display: 'flex', flexDirection: 'row' }} key={index}>
-                                  <div style={{ width: '100%' }} className="form-group">
-                                    <TextField
-                                      type="string"
-                                      label="Company"
-                                      margin="normal"
-                                      className="kt-width-full"
-                                      name={`blacklistedCompany.${index}`}
-                                      onBlur={handleBlur}
-                                      onChange={(e) => {
-                                        arrayHelpers.replace(index, {companyName: e.target.value})
-                                      }}
-                                      value={company.companyName}
-                                    />
-                                  </div>
-                                  <button
-                                    type="button"
-                                    style={{ alignSelf: 'center' }}
-                                    className={`btn btn-primary btn-elevate kt-login__btn-primary`}
-                                    onClick={() => {
-                                        arrayHelpers.remove(index)
-                                    }} // remove a friend from the list
-                                  >
-                                    -
-                              </button>
-                                  <button
-                                    style={{ alignSelf: 'center' }}
-                                    className={`btn btn-primary btn-elevate kt-login__btn-primary`}
-                                    type="button"
-                                    onClick={() => arrayHelpers.insert(index, '')} // insert an empty string at a position
-                                  >
-                                    +
-                              </button>
-                                </div>
-                              );
-                            })
-                          ) : (
-                              <button className={`btn btn-primary btn-elevate kt-login__btn-primary`} type="button" onClick={() => arrayHelpers.push('')}>
-                                {/* show this when user has removed all friends from the list */}
-                          Add a Company
-                              </button>
-                            )}
-                        </div>
-                      );
-                }}
+              <TextField
+                type="string"
+                label="Company"
+                margin="normal"
+                className="kt-width-full"
+                name={`companyName`}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.companyName}
+                helperText={touched.companyName && errors.companyName}
+                error={Boolean(touched.companyName && errors.companyName)}
               />
 
               <div className="kt-login__actions">
@@ -128,12 +79,12 @@ const CreateLocationComponent = ({ handleClose }) => {
             </form>
           )}
       </Formik>
-        </Modal>
-    );
+    </Modal>
+  );
 }
 
 const mapStateToProps = ({ auth: { user }, builder }) => ({
-    user,
+  user,
 });
 
 export const AddCompanies = connect(mapStateToProps)(CreateLocationComponent);

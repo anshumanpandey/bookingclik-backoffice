@@ -8,8 +8,10 @@ import { Button } from '@material-ui/core';
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import MomentUtils from '@date-io/moment';
 import { CSVLink, CSVDownload } from "react-csv";
+import { connect } from "react-redux";
 
-export default function Clients() {
+
+function Clients({ user }) {
     const [searcherApproved, setSearcherApproved] = useState(null);
     const [dates, setDates] = useState([moment().startOf('month'), moment().endOf('month')])
 
@@ -87,7 +89,7 @@ export default function Clients() {
                 <>
                     <CalendarInput />
                     <CSVLink
-                        filename={`bookingclik-click-export-${moment().format()}`}
+                        filename={`${user.companyName}-${moment().format()}.csv`}
                         data={dataToApprovedDisplay.map(i => {
                             return {
                                 ip: i.ip,
@@ -100,7 +102,7 @@ export default function Clients() {
                         })}
                     >
                         <Button color="primary" >
-                            Download CVS
+                            Download CSV
                         </Button >
                     </CSVLink>
                 </>
@@ -121,3 +123,10 @@ export default function Clients() {
         </>
     );
 }
+
+
+const mapStateToProps = ({ auth: { user }, builder }) => ({
+    user,
+});
+
+export default connect(mapStateToProps)(Clients);

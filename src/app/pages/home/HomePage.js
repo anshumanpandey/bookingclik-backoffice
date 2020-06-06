@@ -51,7 +51,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
       .then((res) => {
         fulfillUser(res.data)
       })
-  }, [])
+  }, [showModal])
 
   return (
     <Suspense fallback={<LayoutSplashScreen />}>
@@ -99,7 +99,9 @@ function HomePage({ user, menuConfig, fulfillUser }) {
         {/*<Redirect to="/error/error-v1" />*/}
         <Redirect to="/" />
       </Switch>
-      {showModal && <AddCreditsModal /> }
+      {showModal && <AddCreditsModal handleClose={(reason) => {
+        setShowModal(false)
+      }} /> }
     </Suspense>
   );
 }

@@ -10,6 +10,7 @@ import Payments from "../payments"
 import Supplier from "../supplier"
 import BlacklistedCompanies from "../blacklistedCompanies"
 import { AddCreditsModal } from "../payments/AddCreditsModal"
+import { EditProfile } from "../supplier/EditProfile"
 import * as auth from "../../store/ducks/auth.duck";
 import { getUserByToken } from "../../crud/auth.crud";
 
@@ -37,6 +38,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
     { path: "/click", component: MyClick },
     { path: "/supplier", component: Supplier },
     { path: "/blacklist", component: BlacklistedCompanies },
+    { path: "/edit-profile", component: EditProfile },
   ]
 
   let defaultRoute = 'click';

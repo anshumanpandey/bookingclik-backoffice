@@ -18,16 +18,12 @@ var validator = new ValidatePassword({
 });
 
 
-const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
+const CreateLocationComponent = ({ user }) => {
   const [clientsLocationReq, doUpdate] = AxioHook(updateSupplier(), { manual: true })
 
   console.log(user)
 
   return (
-    <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Supplier</Modal.Title>
-      </Modal.Header>
       <Formik
         initialValues={user}
         validate={(values) => {
@@ -67,9 +63,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
           doUpdate({ data: { ...values, supplierId: user.id } })
             .then(() => {
               setSubmitting(false)
-              handleClose('edited');
             })
-            .catch(() => handleClose())
         }}
       >
         {({
@@ -271,14 +265,13 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
             </form>
           )}
       </Formik>
-    </Modal>
   );
 }
 
 
-export const EditSuppplier = injectIntl(
+export const EditProfile = injectIntl(
   connect(
-    null,
+    ({ auth, builder }) => ({ user: auth.user }),
     auth.actions
   )(CreateLocationComponent)
 );

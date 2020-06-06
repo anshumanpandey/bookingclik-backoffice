@@ -80,7 +80,7 @@ const UserProfile = (props) => {
           </div>
           <div className="kt-notification">
 
-            {(user.type == "company") && (
+            {(user.type != "super_admin") && (
               <>
                 <Link to={`/edit-profile`} onClick={() => setForceShow(false)}>
                   <a className="kt-notification__item">
@@ -90,10 +90,7 @@ const UserProfile = (props) => {
                     <div className="kt-notification__item-details">
                       <div className="kt-notification__item-title kt-font-bold">
                         My Profile
-                </div>
-                      <div className="kt-notification__item-time">
-                        Account settings and more
-                </div>
+                    </div>
                     </div>
                   </a>
                 </Link>

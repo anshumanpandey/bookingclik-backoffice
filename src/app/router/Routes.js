@@ -30,6 +30,18 @@ export const Routes = withRouter(({ history, ...oterh }) => {
     shallowEqual
   );
 
+  if (process.env.REACT_APP_SOON) {
+    return (
+      /* Create `LayoutContext` from current `history` and `menuConfig`. */
+      <LayoutContextProvider history={history} menuConfig={menuConfig}>
+        <Switch>
+          <Route path="/" component={ComingSoon} />
+        </Switch>
+      </LayoutContextProvider>
+    );
+
+  }
+
   return (
     /* Create `LayoutContext` from current `history` and `menuConfig`. */
     <LayoutContextProvider history={history} menuConfig={menuConfig}>

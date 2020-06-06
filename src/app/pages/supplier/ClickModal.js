@@ -32,8 +32,21 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                         selector: 'country',
                     },
                     {
+                        name: 'Pick up Location',
+                        selector: 'pickupLocation',
+                    },
+    
+                    {
+                        name: 'Dropoff location',
+                        selector: 'dropoffLocation',
+                    },
+                    {
                         name: 'Created At',
                         selector: 'created_at',
+                    },
+                    {
+                        name: 'Brand',
+                        cell: () => user.companyName
                     },
                 ]}
                 pagination={true}

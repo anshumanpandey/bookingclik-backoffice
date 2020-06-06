@@ -19,9 +19,9 @@ export function postRolesForClient() {
   }
 }
 
-export function updateClient() {
+export function updateSupplier() {
   return {
-    url: `${process.env.REACT_APP_BACKEND_URL ?  process.env.REACT_APP_BACKEND_URL : window.location.origin}/super/clients`,
+    url: `${process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL : window.location.origin}/edit`,
     method: 'PUT'
   }
 }

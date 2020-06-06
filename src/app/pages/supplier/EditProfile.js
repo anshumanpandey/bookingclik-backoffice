@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { TextField, Select, MenuItem } from '@material-ui/core';
-import { updateSupplier } from "../../crud/super/supplier.crud";
+import { updateSupplier } from "../../crud/client.crud";
 import { Formik, FieldArray, Field, Form } from "formik";
 import { injectIntl } from "react-intl";
 import AxioHook from 'axios-hooks'
 import { connect } from "react-redux";
-import { Modal } from "react-bootstrap";
+import { useAppState } from '../AppState';
 import * as auth from '../../store/ducks/auth.duck';
 var ValidatePassword = require('validate-password');
 
@@ -18,10 +18,9 @@ var validator = new ValidatePassword({
 });
 
 
-const CreateLocationComponent = ({ user }) => {
+const CreateLocationComponent = ({ user, fulfillUser }) => {
   const [clientsLocationReq, doUpdate] = AxioHook(updateSupplier(), { manual: true })
-
-  console.log(user)
+  const [, setSuccess] = useAppState('success');
 
   return (
       <Formik
@@ -61,8 +60,10 @@ const CreateLocationComponent = ({ user }) => {
           setSubmitting(true)
           console.log(values)
           doUpdate({ data: { ...values, supplierId: user.id } })
-            .then(() => {
-              setSubmitting(false)
+            .then(({data}) => {
+                setSuccess("Profile updated")
+                fulfillUser(data)
+                setSubmitting(false)
             })
         }}
       >

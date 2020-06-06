@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { Input, Button } from '@material-ui/core';
 import AxioHook from 'axios-hooks'
 import DataTable from 'react-data-table-component';
 import { getMyClicks } from "../../crud/my-click-crud";
 import FuzzySearch from 'fuzzy-search';
-import moment from 'moment';
-// @ts-ignore
-import Calendar from 'rc-calendar';
-// @ts-ignore
-import DatePicker from 'rc-calendar/lib/Picker';
-import 'rc-calendar/assets/index.css';
+
+import {ClickModal} from "./ClickModal";
+
+function groupBy(list, keyGetter) {
+    const map = new Map();
+    list.forEach((item) => {
+         const key = keyGetter(item);
+         const collection = map.get(key);
+         if (!collection) {
+             map.set(key, [item]);
+         } else {
+             collection.push(item);
+         }
+    });
+    return map;
+}
 
 export default function Clients() {
     const [searcherApproved, setSearcherApproved] = useState(null);
 
     const [dataToApprovedDisplay, setDataApprovedDisplay] = useState([]);
-    const [dates, setDates] = useState([moment().startOf('month'), moment().endOf('month')])
     const [displayModal, setDisplayModal] = useState(false);
 
     const [clientsLocationReq, refetch] = AxioHook(getMyClicks())
-
-    useEffect(() => {
-        refetch()
-    }, dates);
 
     const fieldsToFilterFor = ['country', 'ip']
     useEffect(() => {
@@ -33,111 +37,35 @@ export default function Clients() {
         }
     }, [clientsLocationReq]);
 
-    const columns = [
-        {
-            name: 'IP',
-            selector: 'ip',
-        },
-        {
-            name: 'Country',
-            selector: 'country',
-        },
-        {
-            name: 'Date',
-            selector: 'created_at'
-        }
-    ];
 
-    const CalendarInput = () => {
-        return (
-            <>
-                <DatePicker
-                    value={dates[0]}
-                    onChange={(value) => {
-                        return setDates(p => [value, p[1]]);
-                    }}
-                    animation="slide-up"
-                    calendar={<Calendar
-                        showDateInput={false}
-                        format="YYYY-MM-DD"
-                        dateInputPlaceholder="please input"
-                        defaultValue={dates[0]}
-                    />}
-                >
-                    {
-                        () => {
-                            return (
-                                <div style={{ padding: 'unset', margin: 'unset', boxShadow: 'unset' }} className="main-register">
-                                    <div className="custom-form">
-                                        <Input
-                                            style={{ margin: 0, backgroundColor: 'white' }}
-                                            type="text"
-                                            placeholder="please select"
-                                            readOnly
-                                            className="ant-calendar-picker-input ant-input"
-                                            value={`${dates[0].format('YYYY-MM-DD')}` || ''}
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        }
-                    }
-                </DatePicker>
-                <DatePicker
-                    value={dates[1]}
-                    onChange={(value) => {
-                        return setDates(p => [p[0], value]);
-                    }}
-                    animation="slide-up"
-                    calendar={<Calendar
-                        showDateInput={false}
-                        format="YYYY-MM-DD"
-                        dateInputPlaceholder="please input"
-                        defaultValue={dates[1]}
-                    />}
-                >
-                    {
-                        () => {
-                            return (
-                                <div style={{ padding: 'unset', margin: 'unset', boxShadow: 'unset' }} className="main-register">
-                                    <div className="custom-form">
-                                        <Input
-                                            style={{ margin: 0, backgroundColor: 'white' }}
-                                            type="text"
-                                            placeholder="please select"
-                                            readOnly
-                                            className="ant-calendar-picker-input ant-input"
-                                            value={`${dates[1].format('YYYY-MM-DD')}` || ''}
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        }
-                    }
-                </DatePicker>
-            </>
-        );
-    }
+    const agrouped = groupBy(dataToApprovedDisplay, i => i.supplierName)
+    const data = Array.from(agrouped.entries())
+        .reduce((array, next) => {
+            array.push({
+                supplierName: next[0],
+                clicks: next[1]
+            });
+            return array
+        }, [])
 
 
     let BodyApproved = (
         <DataTable
-            data={dataToApprovedDisplay.filter(i => moment(i.created_at).isBetween(dates[0], dates[1]))}
+            data={data}
             subHeader={true}
-            subHeaderComponent={
-                <h5>
-                Total of {dataToApprovedDisplay.filter(i => moment(i.created_at).isBetween(dates[0], dates[1]))?.length} clicks
-                </h5>
-            }
+            onRowClicked={(r) => setDisplayModal(r.clicks)}
             subHeaderAlign="left"
-            progressPending={clientsLocationReq.loading}
-            columns={columns}
+            columns={[
+                {
+                    name: 'Supplier',
+                    selector: 'supplierName'
+                },
+                {
+                    name: 'Total',
+                    selector: 'clicks.length'
+                }
+            ]}
             pagination={true}
-            actions={
-                <>
-                    <CalendarInput />
-                </>
-            }
         />
     );
 
@@ -151,6 +79,7 @@ export default function Clients() {
     return (
         <>
             {BodyApproved}
+            {displayModal && <ClickModal clicks={displayModal} handleClose={() => setDisplayModal(false)} />}
         </>
     );
 }

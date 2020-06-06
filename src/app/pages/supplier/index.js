@@ -35,10 +35,6 @@ const SupplierComponent = () => {
 
     const columns = [
         {
-            name: 'ID',
-            selector: 'id',
-        },
-        {
             name: 'Email',
             selector: 'email',
         },
@@ -97,7 +93,11 @@ const SupplierComponent = () => {
                     }}>Create</Button>
                 </>
             }
-            data={dataToApprovedDisplay}
+            data={dataToApprovedDisplay.sort(function(a, b){
+                if(a.email < b.email) { return -1; }
+                if(a.email > b.email) { return 1; }
+                return 0;
+            })}
         />
     );
 

@@ -59,7 +59,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
       {error && (
         <Notification msg={error} onClose={() => setError(false)} severity={'error'} />
       )}
-      {user.credits < 10 && showError && (
+      {user.credits < 10 && showError && user.type !== 'super_admin' && (
         <div role="alert" className="alert alert-danger">
           <div className="alert-text">
             You are running out of clicks. To add more clicks please click <a onClick={() => setShowModal(true)} href="#">here</a>

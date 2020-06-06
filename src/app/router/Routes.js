@@ -46,7 +46,7 @@ export const Routes = withRouter(({ history, ...oterh }) => {
 
         {!isAuthorized ? (
           /* Redirect to `/auth` when user is not authorized */
-          <Redirect to="/" />
+          <Redirect to="/admin" />
         ) : (
           <Layout>
             <HomePage userLastLocation={userLastLocation} />

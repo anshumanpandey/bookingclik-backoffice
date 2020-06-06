@@ -8,11 +8,11 @@ import * as auth from "../../store/ducks/auth.duck";
 import { requestPassword } from "../../crud/auth.crud";
 
 class ForgotPassword extends Component {
-  state = { isRequested: false };
+  state = { isRequested: false, success: false };
 
   render() {
     const { intl } = this.props;
-    const { isRequested } = this.state;
+    const { isRequested, success } = this.state;
 
     if (isRequested) {
       return <Redirect to="/auth" />;
@@ -50,9 +50,12 @@ class ForgotPassword extends Component {
               onSubmit={(values, { setStatus, setSubmitting }) => {
                 requestPassword(values.email)
                   .then(() => {
-                    this.setState({ isRequested: true });
+                    this.setState({ success: "Email sended!" });
+                    setTimeout(() => {
+                      this.setState({ isRequested: true });
+                    }, 2000)
                   })
-                  .catch(() => {
+                  .catch((err) => {
                     setSubmitting(false);
                     setStatus(
                       intl.formatMessage(
@@ -77,6 +80,11 @@ class ForgotPassword extends Component {
                   {status && (
                     <div role="alert" className="alert alert-danger">
                       <div className="alert-text">{status}</div>
+                    </div>
+                  )}
+                  {success && (
+                    <div role="alert" className="alert alert-success">
+                      <div className="alert-text">{success}</div>
                     </div>
                   )}
 

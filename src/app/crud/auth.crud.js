@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const normalAxios = axios.create()
+
 export const LOGIN_URL = "api/auth/login";
 export const REGISTER_URL = "api/auth/register";
 export const REQUEST_PASSWORD_URL = "api/auth/forgot-password";
@@ -19,7 +21,9 @@ export function register(body) {
 }
 
 export function requestPassword(email) {
-  return axios.post(REQUEST_PASSWORD_URL, { email });
+  return normalAxios.post(
+    `${process.env.REACT_APP_BACKEND_URL ?  process.env.REACT_APP_BACKEND_URL : window.location.origin}/public/forgot`,
+    { email });
 }
 
 export function instagramLogin() {

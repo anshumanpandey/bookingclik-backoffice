@@ -33,7 +33,11 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
           confirmPassword: '',
           costPerClick: 1,
           type: "supplier",
-          currencySymbol: '$'
+          currencySymbol: '$',
+          firstName: '',
+          lastName: '',
+          address: '',
+          phonenumber: '',
         }}
         validate={(values) => {
           const errors = {};
@@ -172,6 +176,66 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   value={values.companyName}
                   helperText={touched.companyName && errors.companyName}
                   error={Boolean(touched.companyName && errors.companyName)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="First Name"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="firstName"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.firstName}
+                  helperText={touched.firstName && errors.firstName}
+                  error={Boolean(touched.firstName && errors.firstName)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="Last Name"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="lastName"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.lastName}
+                  helperText={touched.lastName && errors.lastName}
+                  error={Boolean(touched.lastName && errors.lastName)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="Address"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="address"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.address}
+                  helperText={touched.address && errors.address}
+                  error={Boolean(touched.address && errors.address)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="phonenumber"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="phonenumber"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.phonenumber}
+                  helperText={touched.phonenumber && errors.phonenumber}
+                  error={Boolean(touched.phonenumber && errors.phonenumber)}
                 />
               </div>
 

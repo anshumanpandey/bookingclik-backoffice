@@ -36,7 +36,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
           if (!values.currencySymbol) errors.currencySymbol = 'Required'
           if (!values.costPerClick) errors.costPerClick = 'Required'
           if (!values.companyName) errors.companyName = 'Required'
-          if (!values.credits) errors.credits = 'Required'
 
           if (values.password || values.confirmPassword) {
             if (values.password != values.confirmPassword){
@@ -58,6 +57,8 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
             if (values.confirmPassword.length < 4) errors.confirmPassword = "Password too short"
 
           }
+
+          console.log(errors)
 
           return errors;
         }}
@@ -188,6 +189,66 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
               <div className="form-group">
                 <TextField
                   type="string"
+                  label="First Name"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="firstName"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.firstName}
+                  helperText={touched.firstName && errors.firstName}
+                  error={Boolean(touched.firstName && errors.firstName)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="Last Name"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="lastName"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.lastName}
+                  helperText={touched.lastName && errors.lastName}
+                  error={Boolean(touched.lastName && errors.lastName)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="Address"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="address"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.address}
+                  helperText={touched.address && errors.address}
+                  error={Boolean(touched.address && errors.address)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
+                  label="phonenumber"
+                  margin="normal"
+                  className="kt-width-full"
+                  name="phonenumber"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.phonenumber}
+                  helperText={touched.phonenumber && errors.phonenumber}
+                  error={Boolean(touched.phonenumber && errors.phonenumber)}
+                />
+              </div>
+
+              <div className="form-group">
+                <TextField
+                  type="string"
                   margin="normal"
                   label="Credits"
                   className="kt-width-full"
@@ -196,8 +257,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.credits}
-                  helperText={touched.credits && errors.credits}
-                  error={Boolean(touched.credits && errors.credits)}
                 />
               </div>
 

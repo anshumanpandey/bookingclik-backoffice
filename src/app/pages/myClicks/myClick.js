@@ -97,7 +97,7 @@ function Clients({ user }) {
                                 dropoffLocation: i.dropoffLocation,
                                 pickupLocation: i.pickupLocation,
                                 created_at: i.created_at,
-                                supplierName: i.supplierName,
+                                brand: i.supplierName,
                             };
                         })}
                     >

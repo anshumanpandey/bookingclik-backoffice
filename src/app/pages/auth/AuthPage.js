@@ -40,7 +40,7 @@ export default function AuthPage() {
               <div className="kt-grid__item">
                 <div className="kt-login__info">
                   <div className="kt-login__copyright">
-                    &copy; 2020 Copyright BookingClik Limited
+                    &copy; 2020 Bookingclik Ltd
                   </div>
                   <div className="kt-login__menu">
                     <Link to="/terms" className="kt-link">

@@ -16,6 +16,7 @@ import { LayoutContextProvider } from "../../_metronic";
 import Layout from "../../_metronic/layout/Layout";
 import * as routerHelpers from "../router/RouterHelpers";
 import AuthPage from "../pages/auth/AuthPage";
+import ComingSoon from "../pages/comingSoon/"
 
 export const Routes = withRouter(({ history, ...oterh }) => {
   const lastLocation = useLastLocation();
@@ -40,6 +41,8 @@ export const Routes = withRouter(({ history, ...oterh }) => {
           /* Otherwise redirect to root page (`/`) */
           <Redirect from="/auth" to={userLastLocation} />
         )}
+
+        { process.env.REACT_APP_SOON && <Route path="/" component={ComingSoon} />}
 
         <Route path="/error" component={ErrorsPage} />
         <Route path="/logout" component={LogoutPage} />

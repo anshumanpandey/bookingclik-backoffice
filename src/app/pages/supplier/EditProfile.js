@@ -139,7 +139,7 @@ const CreateLocationComponent = ({ user, fulfillUser }) => {
                 <div className="form-group" style={{ display: 'flex' }}>
                   <TextField
                     disabled={true}
-                    style={{ marginTop: 'auto', marginBottom: 'auto', width: '10%' }}
+                    style={{ marginBottom: 'auto', width: '10%' }}
                     type="string"
                     margin="normal"
                     className="kt-width-full"

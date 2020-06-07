@@ -139,9 +139,8 @@ const CreateLocationComponent = ({ user, fulfillUser }) => {
                 <div className="form-group" style={{ display: 'flex' }}>
                   <TextField
                     disabled={true}
-                    style={{ marginTop: 'auto', marginBottom: 'auto' }}
+                    style={{ marginTop: 'auto', marginBottom: 'auto', width: '10%' }}
                     type="string"
-                    label="Cost Per Click"
                     margin="normal"
                     className="kt-width-full"
                     name="currencySymbol"

@@ -137,18 +137,21 @@ const CreateLocationComponent = ({ user, fulfillUser }) => {
 
               <div>
                 <div className="form-group" style={{ display: 'flex' }}>
-                  <Select
-                    style={{ marginRight: '1rem' }}
-                    label="Currency Symbol"
-                    name="currencySymbol"
-                    value={values.currencySymbol}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value={"$"}>$</MenuItem>
-                    <MenuItem value={"£"}>£</MenuItem>
-                    <MenuItem value={"€"}>€</MenuItem>
-                  </Select>
                   <TextField
+                    disabled={true}
+                    style={{ marginTop: 'auto', marginBottom: 'auto' }}
+                    type="string"
+                    label="Cost Per Click"
+                    margin="normal"
+                    className="kt-width-full"
+                    name="currencySymbol"
+                    onBlur={handleBlur}
+                    value={values.currencySymbol}
+                    helperText={touched.currencySymbol && errors.currencySymbol}
+                    error={Boolean(touched.currencySymbol && errors.currencySymbol)}
+                  />
+                  <TextField
+                    disabled={true}
                     style={{ marginTop: 'auto', marginBottom: 'auto' }}
                     type="string"
                     label="Cost Per Click"
@@ -156,7 +159,6 @@ const CreateLocationComponent = ({ user, fulfillUser }) => {
                     className="kt-width-full"
                     name="costPerClick"
                     onBlur={handleBlur}
-                    onChange={handleChange}
                     value={values.costPerClick}
                     helperText={touched.costPerClick && errors.costPerClick}
                     error={Boolean(touched.costPerClick && errors.costPerClick)}
@@ -238,21 +240,6 @@ const CreateLocationComponent = ({ user, fulfillUser }) => {
                   error={Boolean(touched.phonenumber && errors.phonenumber)}
                 />
               </div>
-
-              <div className="form-group">
-                <TextField
-                  type="string"
-                  margin="normal"
-                  label="Credits"
-                  className="kt-width-full"
-                  name="credits"
-                  disabled={true}
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.credits}
-                />
-              </div>
-
               <div className="kt-login__actions">
                 <button
                   id="kt_login_signin_submit"

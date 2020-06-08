@@ -28,7 +28,6 @@ const CreateLocationComponent = ({ user, fulfillUser }) => {
         validate={(values) => {
           const errors = {}
           if (!values.email) errors.email = 'Required'
-          if (!values.currencySymbol) errors.currencySymbol = 'Required'
           if (!values.costPerClick) errors.costPerClick = 'Required'
           if (!values.companyName) errors.companyName = 'Required'
 

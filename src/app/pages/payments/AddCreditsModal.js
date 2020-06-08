@@ -14,10 +14,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
     const [amount, setAmount] = useState(0);
     const [payReq, doReport] = AxioHook(reportPayment(), { manual: true })
 
-    let currency = 'USD';
-    if (user.currency == '€') currency = 'EUR'
-    if (user.currency == '£') currency = 'GBP'
-
     return (
         <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
             <Modal.Header closeButton>
@@ -85,7 +81,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                         }}
                         options={{
                             clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A",
-                            currency
+                            currency: 'GBP'
                         }}
                     />
                 </div>

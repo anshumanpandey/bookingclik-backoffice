@@ -233,6 +233,18 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
               </div>
 
               <div className="form-group">
+                <Select
+                  fullWidth
+                  name="type"
+                  value={values.type}
+                  onChange={handleChange}
+                >
+                  <MenuItem value={"supplier"}>Supplier</MenuItem>
+                  <MenuItem value={"broker"}>Broker</MenuItem>
+                </Select>
+              </div>
+
+              <div className="form-group">
                 <TextField
                   type="string"
                   margin="normal"

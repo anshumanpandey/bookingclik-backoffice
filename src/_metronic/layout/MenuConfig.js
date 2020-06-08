@@ -15,6 +15,14 @@ export default {
         desc: 'Map your codes to an IATA code'
       },
       {
+        title: "Banner Advertising",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "bannerAdvertising",
+        roles: ['broker', 'supplier'],
+        desc: 'Map your codes to an IATA code'
+      },
+      {
         title: "Clicks",
         root: true,
         icon: "flaticon2-architecture-and-city",

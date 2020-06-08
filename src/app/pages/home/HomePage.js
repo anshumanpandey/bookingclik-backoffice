@@ -8,7 +8,6 @@ import { useAppState } from '../AppState';
 import MyClick from "../myClicks/myClick";
 import Payments from "../payments"
 import Supplier from "../supplier"
-import BlacklistedCompanies from "../blacklistedCompanies"
 import { AddCreditsModal } from "../payments/AddCreditsModal"
 import { EditProfile } from "../supplier/EditProfile"
 import * as auth from "../../store/ducks/auth.duck";
@@ -37,7 +36,6 @@ function HomePage({ user, menuConfig, fulfillUser }) {
     { path: "/transactions", component: Payments },
     { path: "/click", component: MyClick },
     { path: "/supplier", component: Supplier },
-    { path: "/blacklist", component: BlacklistedCompanies },
     { path: "/edit-profile", component: EditProfile },
   ]
 

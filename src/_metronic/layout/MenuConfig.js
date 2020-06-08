@@ -30,14 +30,6 @@ export default {
         roles: ['super_admin'],
         desc: 'Map your codes to an IATA code'
       },
-      {
-        title: "Blacklisted Companies",
-        root: true,
-        icon: "flaticon2-architecture-and-city",
-        page: "blacklist",
-        roles: ['super_admin'],
-        desc: 'Map your codes to an IATA code'
-      },
     ]
   }
 };

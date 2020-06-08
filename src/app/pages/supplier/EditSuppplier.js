@@ -12,8 +12,7 @@ var ValidatePassword = require('validate-password');
 var validator = new ValidatePassword({
   enforce: {
     lowercase: true,
-    uppercase: true,
-    numbers: true
+
   }
 });
 

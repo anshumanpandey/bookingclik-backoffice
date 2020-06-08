@@ -81,9 +81,12 @@ const SupplierComponent = () => {
         {
             name: 'Blacklisted Companies',
             cell: (r) => {
-                return <BusinessIcon onClick={() => {
-                    setShowCompanies(r);
-                }}/>
+                if (r.type == 'broker') {
+                    return <BusinessIcon onClick={() => {
+                        setShowCompanies(r);
+                    }}/>
+                }
+                return <></>;
             },
         }
     ];

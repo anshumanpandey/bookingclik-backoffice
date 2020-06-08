@@ -9,9 +9,12 @@ import { PaymentModal } from './PaymentModal';
 import { ClickModal } from './ClickModal';
 import { CreateUserModal } from './CreateUserModal';
 import { EditSuppplier } from './EditSuppplier';
+import { CompaniesModal } from './CompaniesModal';
 import PaymentIcon from '@material-ui/icons/Payment';
 import MouseIcon from '@material-ui/icons/Mouse';
 import EditIcon from '@material-ui/icons/Edit';
+import BusinessIcon from '@material-ui/icons/Business';
+
 
 const SupplierComponent = () => {
     const [searcherApproved, setSearcherApproved] = useState(null);
@@ -21,6 +24,7 @@ const SupplierComponent = () => {
     const [showClickModal, setShowClickModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showCompanies, setShowCompanies] = useState(false);
 
     const [clientsLocationReq, refetch] = AxioHook(getSupplier())
 
@@ -73,6 +77,14 @@ const SupplierComponent = () => {
                     setShowEditModal(r);
                 }}/>
             },
+        },
+        {
+            name: 'Blacklisted Companies',
+            cell: (r) => {
+                return <BusinessIcon onClick={() => {
+                    setShowCompanies(r);
+                }}/>
+            },
         }
     ];
 
@@ -116,6 +128,7 @@ const SupplierComponent = () => {
                 if (reason == 'created') refetch();
             }} />}
             {showPaymentModal && <PaymentModal user={showPaymentModal} handleClose={() => setShowPaymentModal(false)} />}
+            {showCompanies && clientsLocationReq.data.find(i => i.id == showCompanies.id) && <CompaniesModal refetch={refetch} user={clientsLocationReq.data.find(i => i.id == showCompanies.id)} handleClose={() => setShowCompanies(false)} />}
             {showClickModal && <ClickModal  user={showClickModal} handleClose={() => setShowClickModal(false)} />}
             {showEditModal && <EditSuppplier  user={showEditModal} handleClose={(reason) => {
                 setShowEditModal(false)

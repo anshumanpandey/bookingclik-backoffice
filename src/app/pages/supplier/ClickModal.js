@@ -1,17 +1,37 @@
 import React, { useState } from 'react';
 import { TextField, FormControlLabel, Checkbox, Button } from '@material-ui/core';
-import { reportPayment } from "../../crud/pay.crud";
 import DataTable from 'react-data-table-component';
 import { injectIntl } from "react-intl";
-import AxioHook from 'axios-hooks'
+import moment from 'moment';
 import { connect } from "react-redux";
 import { Modal } from "react-bootstrap";
-import { PayPalButton } from "react-paypal-button-v2";
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
 
 
 const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
-    const [amount, setAmount] = useState(0);
-    const [payReq, doReport] = AxioHook(reportPayment(), { manual: true })
+    const [dates, setDates] = useState([moment().startOf('month'), moment().endOf('month')])
+
+    const CalendarInput = () => {
+        return (
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+                <DatePicker
+                    value={dates[0]}
+                    onChange={(d) => setDates(p => [d, p[1]])}
+                    disableToolbar
+                    variant="inline"
+                />
+
+                <DatePicker
+                    value={dates[1]}
+                    onChange={(d) => setDates(p => [p[0],d])}
+                    disableToolbar
+                    variant="inline"
+                />
+
+            </MuiPickersUtilsProvider>
+        );
+    }
 
 
     return (
@@ -20,7 +40,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                 <Modal.Title>Clicks</Modal.Title>
             </Modal.Header>
             <DataTable
-                noHeader={true}
                 subHeaderAlign="center"
                 columns={[
                     {
@@ -50,7 +69,12 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                     },
                 ]}
                 pagination={true}
-                data={user.ClickTracks}
+                data={user.ClickTracks.filter(i => moment(i.created_at).isBetween(dates[0], dates[1]))}
+                actions={
+                    <>
+                        <CalendarInput />
+                    </>
+                }
             />
         </Modal>
     );

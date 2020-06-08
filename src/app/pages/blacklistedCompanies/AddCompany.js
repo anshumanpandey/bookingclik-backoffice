@@ -15,7 +15,7 @@ const CreateLocationComponent = ({ handleClose }) => {
   return (
     <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
       <Modal.Header closeButton>
-        <Modal.Title>Add Funds to your Account</Modal.Title>
+        <Modal.Title>Add Blacklisted Company</Modal.Title>
       </Modal.Header>
       <Formik
         initialValues={{ companyName: '' }}

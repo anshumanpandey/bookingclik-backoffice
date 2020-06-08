@@ -19,8 +19,6 @@ var validator = new ValidatePassword({
 const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
   const [clientsLocationReq, doUpdate] = AxioHook(updateSupplier(), { manual: true })
 
-  console.log(user)
-
   return (
     <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
       <Modal.Header closeButton>

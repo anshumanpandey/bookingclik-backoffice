@@ -27,13 +27,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
             >
                 <div style={{ paddingLeft: 0}} className="alert alert-light">
                     <div style={{ color: '#5867dd'}} className="alert-text">
-                        Current Balance: ${user.Payments.reduce((p,n) => {
-                            p = p + n.amount;
-                            return p
-                        },0) * user.costPerClick} ({user.Payments.reduce((p,n) => {
-                            p = p + n.amount
-                            return p
-                        },0) * user.costPerClick} clicks)
+                        Current Balance: {user.currencySymbol}{user.balance} ({user.credits} clicks)
                     </div>
                 </div>
 
@@ -80,7 +74,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                                 })
                         }}
                         options={{
-                            clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A",
+                            clientId: "AXrYo6CvTv__6wTusNmIaoQzvoBIt4wWb1QkScA-P62hAKfLQO_1nYI_uoShp-RlRyPITUVrRM-GgpnG",
                             currency: 'GBP'
                         }}
                     />

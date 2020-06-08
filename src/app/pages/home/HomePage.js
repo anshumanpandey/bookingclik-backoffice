@@ -7,6 +7,7 @@ import Notification from "../../widgets/Notification";
 import { useAppState } from '../AppState';
 import MyClick from "../myClicks/myClick";
 import Payments from "../payments"
+import BlacklistedCompanies from "../blacklistedCompanies"
 import BannerAdvertising from "../bannerAdvertising"
 import Supplier from "../supplier"
 import { AddCreditsModal } from "../payments/AddCreditsModal"
@@ -38,8 +39,8 @@ function HomePage({ user, menuConfig, fulfillUser }) {
     { path: "/click", component: MyClick },
     { path: "/supplier", component: Supplier },
     { path: "/edit-profile", component: EditProfile },
-    { path: "/edit-profile", component: EditProfile },
     { path: "/bannerAdvertising", component: BannerAdvertising },    
+    { path: "/blacklisted", component: BlacklistedCompanies },    
   ]
 
   let defaultRoute = 'click';

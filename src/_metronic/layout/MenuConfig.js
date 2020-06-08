@@ -23,6 +23,14 @@ export default {
         desc: 'Map your codes to an IATA code'
       },
       {
+        title: "Blacklisted Companies",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "blacklisted",
+        roles: ['broker'],
+        desc: 'Map your codes to an IATA code'
+      },
+      {
         title: "Clicks",
         root: true,
         icon: "flaticon2-architecture-and-city",

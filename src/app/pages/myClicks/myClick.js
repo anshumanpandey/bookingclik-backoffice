@@ -33,6 +33,7 @@ function Clients({ user }) {
         return (
             <MuiPickersUtilsProvider utils={MomentUtils}>
                 <DatePicker
+                    label="From"
                     value={dates[0]}
                     onChange={(d) => setDates(p => [d, p[1]])}
                     disableToolbar
@@ -40,6 +41,7 @@ function Clients({ user }) {
                 />
 
                 <DatePicker
+                    label="To"
                     value={dates[1]}
                     onChange={(d) => setDates(p => [p[0],d])}
                     disableToolbar

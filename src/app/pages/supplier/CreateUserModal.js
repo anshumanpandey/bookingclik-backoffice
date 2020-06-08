@@ -237,19 +237,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
                   error={Boolean(touched.phonenumber && errors.phonenumber)}
                 />
               </div>
-
-              <div className="form-group">
-                <Select
-                  fullWidth
-                  name="type"
-                  value={values.type}
-                  onChange={handleChange}
-                >
-                  <MenuItem value={"supplier"}>Supplier</MenuItem>
-                  <MenuItem value={"broker"}>Broker</MenuItem>
-                </Select>
-              </div>
-
           
               <div className="kt-login__actions">
                 <button

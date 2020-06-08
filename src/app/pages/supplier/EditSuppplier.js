@@ -142,17 +142,6 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
 
               <div>
                 <div className="form-group" style={{ display: 'flex' }}>
-                  <Select
-                    style={{ marginRight: '1rem' }}
-                    label="Currency Symbol"
-                    name="currencySymbol"
-                    value={values.currencySymbol}
-                    onChange={handleChange}
-                  >
-                    <MenuItem value={"$"}>$</MenuItem>
-                    <MenuItem value={"£"}>£</MenuItem>
-                    <MenuItem value={"€"}>€</MenuItem>
-                  </Select>
                   <TextField
                     style={{ marginTop: 'auto', marginBottom: 'auto' }}
                     type="string"

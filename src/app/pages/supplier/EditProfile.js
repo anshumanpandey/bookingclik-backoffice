@@ -139,18 +139,6 @@ const CreateLocationComponent = ({ user, fulfillUser }) => {
                 <div className="form-group" style={{ display: 'flex' }}>
                   <TextField
                     disabled={true}
-                    style={{ marginBottom: 'auto', width: '10%' }}
-                    type="string"
-                    margin="normal"
-                    className="kt-width-full"
-                    name="currencySymbol"
-                    onBlur={handleBlur}
-                    value={values.currencySymbol}
-                    helperText={touched.currencySymbol && errors.currencySymbol}
-                    error={Boolean(touched.currencySymbol && errors.currencySymbol)}
-                  />
-                  <TextField
-                    disabled={true}
                     style={{ marginTop: 'auto', marginBottom: 'auto' }}
                     type="string"
                     label="Cost Per Click"

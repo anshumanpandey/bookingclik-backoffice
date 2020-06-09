@@ -49,7 +49,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, user }) => {
             } else if (!validation2.isValid) {
               errors.confirmPassword = validation2.validationMessage
             }
-            if (values.confirmPassword.length < 4) errors.confirmPassword = "Password too short"
+            if (values.confirmPassword && values.confirmPassword.length < 4) errors.confirmPassword = "Password too short"
 
           }
 

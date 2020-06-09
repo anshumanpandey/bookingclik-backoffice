@@ -41,14 +41,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                             if (e.target.value == "") {
                                 setAmount(0)
                             } else {
-                                try{
-                                    const amount = new Decimal(e.target.value)
-                                    if (amount.isNaN() == false) {
-                                        setAmount(amount.floor().toString())
-                                    }
-                                } catch(err) {
-
-                                }
+                                setAmount(e.target.value)
                             }
                         }}
                         value={amount}

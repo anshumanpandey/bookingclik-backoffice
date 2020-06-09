@@ -20,7 +20,7 @@ const UserProfile = (props) => {
   let prefix = null
 
   if (user && user.type != "super_admin") {
-    prefix = `Balance ${user.currencySymbol}${user.balance} (${user.credits} clicks)`
+    prefix = `Balance ${user.currencySymbol}${parseFloat(user.balance).toFixed(2)} (${user.credits} clicks)`
   }
 
   return (

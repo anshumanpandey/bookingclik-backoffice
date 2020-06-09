@@ -8,6 +8,7 @@ import { useAppState } from '../AppState';
 import MyClick from "../myClicks/myClick";
 import Payments from "../payments"
 import BlacklistedCompanies from "../blacklistedCompanies"
+import Visitors from "../visitors"
 import BannerAdvertising from "../bannerAdvertising"
 import Supplier from "../supplier"
 import { AddCreditsModal } from "../payments/AddCreditsModal"
@@ -41,6 +42,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
     { path: "/edit-profile", component: EditProfile },
     { path: "/bannerAdvertising", component: BannerAdvertising },    
     { path: "/blacklisted", component: BlacklistedCompanies },    
+    { path: "/visitors", component: Visitors },    
   ]
 
   let defaultRoute = 'click';

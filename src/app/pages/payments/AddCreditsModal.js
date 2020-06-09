@@ -56,7 +56,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                 </div>
                 <div style={{ paddingLeft: 0}} className="alert alert-light">
                     <div style={{ color: '#5867dd'}} className="alert-text">
-                        New payment: ${amount} x ${user.costPerClick}/click = {amount / user.costPerClick} clicks
+                        New payment: ${amount} x ${user.costPerClick}/click = {Math.floor(amount / user.costPerClick)} clicks
                     </div>
                 </div>
 

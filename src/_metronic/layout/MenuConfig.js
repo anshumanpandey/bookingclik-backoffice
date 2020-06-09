@@ -27,7 +27,7 @@ export default {
         root: true,
         icon: "flaticon2-architecture-and-city",
         page: "blacklisted",
-        roles: ['broker'],
+        roles: ['supplier'],
         desc: 'Map your codes to an IATA code'
       },
       {

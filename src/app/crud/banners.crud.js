@@ -1,6 +1,6 @@
 export function getLocations() {
   return {
-    url: `http://localhost:3010/api/public/locationCodes`,
+    url: `https://www.grcgds.com/admincarrental/api/public/locationCodes`,
     method: 'POST'
   }
 }

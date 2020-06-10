@@ -15,7 +15,7 @@ const CreateLocationComponent = ({ handleClose, bannerMetadata }) => {
   return (
     <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
       <Modal.Header closeButton>
-        <Modal.Title>Buy Banners</Modal.Title>
+        <Modal.Title>Edit Banner Data</Modal.Title>
       </Modal.Header>
       <Formik
         enableReinitialize
@@ -60,10 +60,11 @@ const CreateLocationComponent = ({ handleClose, bannerMetadata }) => {
               <TextField
                 disabled
                 type="string"
-                label="Company"
+                label="Location Name"
                 margin="normal"
                 className="kt-width-full"
                 name={`locationName`}
+                value={values.locationName}
                 onBlur={handleBlur}
               />
 

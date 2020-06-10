@@ -10,6 +10,11 @@ import { PayPalButton } from "react-paypal-button-v2";
 import { connect } from "react-redux";
 import countries from "../../widgets/countryDropdown/countries.json"
 import * as auth from "../../store/ducks/auth.duck";
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
+import moment from 'moment'
+import DeleteIcon from '@material-ui/icons/Delete';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,16 +64,17 @@ const CreateLocationComponent = ({ handleClose }) => {
   const [selectedLocations, setSelectedLocations] = useState([]);
   const classes = useStyles();
 
+
   const [postReq, doPost] = AxioHook(postBannerRecip(), { manual: true })
 
   useEffect(() => {
     if (locationsReq.data) {
       const list = locationsReq.data.reduce((json, next) => {
-        const { country, locationname } = next
+        const { country, locationName } = next
         if (!json[country]) {
-          json[country] = [locationname]
+          json[country] = [next]
         } else {
-          json[country].push(locationname)
+          json[country].push(next)
         }
         return json;
       }, {})
@@ -100,7 +106,8 @@ const CreateLocationComponent = ({ handleClose }) => {
           handleChange,
           handleBlur,
           handleSubmit,
-          isSubmitting
+          isSubmitting,
+          setFieldError
         }) => (
             <form
               style={{ padding: '2rem' }}
@@ -159,19 +166,19 @@ const CreateLocationComponent = ({ handleClose }) => {
                             onChange={(e) => {
                               const newElement = e.target.value[e.target.value.length - 1]
 
-                              const foundIdx = arrayHelpers.form.values.selectedLocations.findIndex(p => p.locationName == newElement)
+                              const foundIdx = arrayHelpers.form.values.selectedLocations.findIndex(p => p.locationName == newElement.locationName)
                               if (foundIdx !== -1) {
                                 return arrayHelpers.remove(foundIdx)
                               }
-                              arrayHelpers.push({ locationName: newElement, frequency: BUY_UNITS.DAY, amount: 1 })
+                              arrayHelpers.push({ ...newElement, error: false,fromDate: moment().startOf('day'), toDate: moment().add('day', 1).endOf('day') })
 
                             }}
                           >
                             {perCountry[selectedCountry].map((c) => {
                               return (
                                 <MenuItem key={c} value={c} >
-                                  <Checkbox checked={arrayHelpers.form.values.selectedLocations.find(i => i.locationName == c) !== undefined} />
-                                  <ListItemText primary={c} />
+                                  <Checkbox checked={arrayHelpers.form.values.selectedLocations.find(i => i.locationName == c.locationName) !== undefined} />
+                                  <ListItemText primary={c.locationName} />
                                 </MenuItem>
                               );
                             })}
@@ -180,124 +187,176 @@ const CreateLocationComponent = ({ handleClose }) => {
                       </div>
                     )}
 
-                    {arrayHelpers.form.values.selectedLocations.map((location, index) => (
-                      <div style={{ display: 'flex' }}>
-                        <div style={{ flex: 1, display: 'flex', }}>
-                          <Input style={{ alignSelf: 'end' }} disabled={true} value={location.locationName} />
-                        </div>
+                    {arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
+                      let ocuppiedRange = []
+                      const isFilled = arr.some(i => {
+                        if (i.BannerPurchaseds.length == 0) {
+                          return false
+                        }
 
-                        <div style={{ flex: 1, display: 'flex', }}>
-                          <TextField
-                            fullWidth
-                            style={{ alignSelf: 'end' }}
-                            label={`Amount of ${location.frequency}s`}
-                            onChange={(e) => arrayHelpers.replace(index, { ...location, amount: e.target.value })}
-                            value={location.amount}
-                          />
-                        </div>
 
-                        <div style={{ display: 'flex', flex: '0.2', justifyContent: 'center' }}>
-                          <h5 style={{ alignSelf: 'end', margin: 0 }}>X</h5>
-                        </div>
+                        return i.BannerPurchaseds.some(purchasedBanner => {
+                          const availableFromDate = moment(purchasedBanner.availableFromDate)
+                          const availableToDate = moment(purchasedBanner.availableToDate)
+                          const isBetween = i.fromDate.isBetween(availableFromDate, availableToDate, undefined, '[]') ||
+                            i.toDate.isBetween(availableFromDate, availableToDate, undefined, '[]');
+                          const isInside = availableFromDate.isBetween(i.fromDate, i.toDate, undefined, '[]') ||
+                            availableToDate.isBetween(i.fromDate, i.toDate, undefined, '[]');
+                          if (isBetween || isInside) ocuppiedRange = [availableFromDate, availableToDate]
+                          return (isBetween || isInside) && location.locationName == i.locationName
+                        })
+                      })
 
-                        <div style={{ flex: 1 }}>
-                          <FormControl style={{ width: '100%' }}>
-                            <InputLabel id="demo-mutiple-name-label">Frequency</InputLabel>
-                            <Select
-                              labelId="demo-mutiple-name-label"
-                              id="demo-mutiple-name"
-                              value={location.frequency}
-                              onChange={(e) => {
-                                arrayHelpers.replace(index, { ...location, frequency: e.target.value })
-                              }}
-                            >
-                              <MenuItem value={BUY_UNITS.DAY}>Day</MenuItem>
-                              <MenuItem value={BUY_UNITS.WEEK}>Week</MenuItem>
-                              <MenuItem value={BUY_UNITS.MONTH}>Month</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </div>
+                      let warning = null
 
-                        <div style={{ display: 'flex', flex: '0.2', justifyContent: 'center' }}>
-                          <h5 style={{ alignSelf: 'end', margin: 0 }}>=</h5>
-                        </div>
+                      if (isFilled) {
+                        if (!location.error) arrayHelpers.replace(index, { ...location, error: true })
+                        warning = <p>
+                          Unfortunately banners are sold out between {ocuppiedRange[0].format(`DD-MM-YYYY hh:mm A`)}
+                          and {ocuppiedRange[1].format(`DD-MM-YYYY hh:mm A`)}. Please change your date range and book your banner ads.
+                          If you want these specific dates only please email admin@bookingclik.com
+                          and our team shall help you out with the purchase
+                        </p>
+                      } else {
+                        if (location.error) arrayHelpers.replace(index, { ...location, error: false })
+                      }
 
-                        <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center' }}>
-                          <h5 style={{ alignSelf: 'end', margin: 0 }}>{resolvePrice(location.amount, location.frequency, location.locationName.match(/(Airport)/))} £</h5>
-                        </div>
+                      return (
+                        <>
+                          <div style={{ display: 'flex' }}>
+                            <div style={{ flex: 1, display: 'flex', }}>
+                              <Input style={{ alignSelf: 'end' }} disabled={true} value={location.locationName} />
+                            </div>
 
-                      </div>
-                    ))}
+                            <div style={{ flex: 3, display: 'flex' }}>
+                              <MuiPickersUtilsProvider utils={MomentUtils}>
+                                <DatePicker
+                                  style={{ flex: 1 }}
+                                  autoOk
+                                  label="From"
+                                  value={location.fromDate}
+                                  onChange={(d) => {
+                                    if (location.toDate.isBefore(d)) {
+                                      arrayHelpers.replace(index, location)
+                                    } else {
+                                      arrayHelpers.replace(index, { ...location, fromDate: d })
+                                    }
+                                  }}
+                                  disableToolbar
+                                  variant="inline"
+                                />
+
+                                <DatePicker
+                                  style={{ flex: 1 }}
+                                  autoOk
+                                  label="To"
+                                  value={location.toDate}
+                                  onChange={(d) => {
+                                    if (location.fromDate.isAfter(d)) {
+                                      arrayHelpers.replace(index, location)
+                                    } else {
+                                      arrayHelpers.replace(index, { ...location, toDate: d })
+                                    }
+                                  }}
+                                  disableToolbar
+                                  variant="inline"
+                                />
+
+                              </MuiPickersUtilsProvider>
+                            </div>
+
+                            <div style={{ display: 'flex', flex: '0.2', justifyContent: 'center' }}>
+                              <h5 style={{ alignSelf: 'end', margin: 0 }}>=</h5>
+                            </div>
+
+                            <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center' }}>
+                              <h5 style={{ alignSelf: 'end', margin: 0 }}>{location.toDate.diff(location.fromDate, 'days') * location.price} £</h5>
+                            </div>
+
+                            <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center', alignItems: 'end', cursor: 'pointer'}}>
+                              <DeleteIcon onClick={() => arrayHelpers.remove(index)} />
+                            </div>
+
+                          </div>
+                          <div>{warning}</div>
+                        </>
+                      );
+                    })}
 
                     {arrayHelpers.form.values.selectedLocations.length !== 0 && (
                       <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
                         <Paper className={classes.paper}>
                           <div>{arrayHelpers.form.values.selectedLocations.length} locations selected</div>
                               Total: {arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                            totalToPay += resolvePrice(next.amount, next.frequency, next.locationName.match(/(Airport)/))
+                            totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
                             return totalToPay
                           }, 0)} £
                           </Paper>
                       </div>
                     )}
 
-                    {arrayHelpers.form.values.selectedLocations.length !== 0 && (
-                      <PayPalButton
-                        createOrder={(data, actions) => {
-                          const totalToPay = arrayHelpers.form.values.selectedLocations.reduce((total, next) => {
-                            total += resolvePrice(next.amount, next.frequency, next.locationName.match(/(Airport)/))
-                            return total
-                          }, 0).toFixed(2)
+                    {arrayHelpers.form.values.selectedLocations.length !== 0 && !arrayHelpers.form.values.selectedLocations.some(l => l.error) &&(
+                        <PayPalButton
+                          createOrder={(data, actions) => {
+                            const totalToPay = arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
+                              totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
+                              return totalToPay
+                            }, 0).toFixed(2)
 
-                          const payData = {
-                            intent: "CAPTURE",
-                            purchase_units: [{
-                              amount: {
-                                currency_code: "GBP",
-                                value: totalToPay,
-                                breakdown: {
-                                  item_total: {
-                                    currency_code: 'GBP',
-                                    value: totalToPay
+                            const payData = {
+                              intent: "CAPTURE",
+                              purchase_units: [{
+                                amount: {
+                                  currency_code: "GBP",
+                                  value: totalToPay,
+                                  breakdown: {
+                                    item_total: {
+                                      currency_code: 'GBP',
+                                      value: totalToPay
+                                    }
                                   }
-                                }
-                              },
-                              items: arrayHelpers.form.values.selectedLocations.map((i) => {
+                                },
+                                items: arrayHelpers.form.values.selectedLocations.map((i) => {
+                                  return {
+                                    name: `banner to be displayed on bookingclik.com during ${i.amount} ${i.frequency}s for ${i.locationName}`,
+                                    quantity: 1,
+                                    unit_amount: {
+                                      currency_code: "GBP",
+                                      value: resolvePrice(i.amount, i.frequency, i.locationName.match(/(Airport)/)).toFixed(2),
+                                    },
+                                  }
+                                }),
+                              }],
+                            }
+                            return actions.order.create(payData);
+                          }}
+                          amount={
+                            arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
+                              totalToPay += resolvePrice(next.amount, next.frequency, next.locationName.match(/(Airport)/))
+                              return totalToPay
+                            }, 0)
+                          }
+                          onSuccess={(details, paypalData) => {
+                            const data = {
+                              orderId: paypalData.orderID,
+                              selectedLocations: arrayHelpers.form.values.selectedLocations.map((l) => {
                                 return {
-                                  name: `banner to be displayed on bookingclik.com during ${i.amount} ${i.frequency}s for ${i.locationName}`,
-                                  quantity: 1,
-                                  unit_amount: {
-                                    currency_code: "GBP",
-                                    value: resolvePrice(i.amount, i.frequency, i.locationName.match(/(Airport)/)).toFixed(2),
-                                  },
+                                  ...l,
+                                  fromDate: l.fromDate.unix(),
+                                  toDate: l.toDate.unix()
                                 }
                               }),
-                            }],
-                          }
-                          return actions.order.create(payData);
-                        }}
-                        amount={
-                          arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                            totalToPay += resolvePrice(next.amount, next.frequency, next.locationName.match(/(Airport)/))
-                            return totalToPay
-                          }, 0)
-                        }
-                        onSuccess={(details, paypalData) => {
-                          const data = {
-                            orderId: paypalData.orderID,
-                            country: countries.find(i => i.code == selectedCountry).name,
-                            selectedLocations: arrayHelpers.form.values.selectedLocations,
-                          };
-                          doPost({ data })
-                          .then(() => {
-                            handleClose();
-                          })
-                        }}
-                        options={{
-                          clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A",
-                          currency: 'GBP'
-                        }}
-                      />
+                            };
+                            doPost({ data })
+                              .then(() => {
+                                handleClose();
+                              })
+                          }}
+                          options={{
+                            clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A",
+                            currency: 'GBP'
+                          }}
+                        />
                     )}
 
                   </div>

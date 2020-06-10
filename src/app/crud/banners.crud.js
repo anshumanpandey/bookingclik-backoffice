@@ -1,7 +1,7 @@
 export function getLocations() {
   return {
-    url: `https://www.grcgds.com/admincarrental/api/public/locationCodes`,
-    method: 'POST'
+    url: `${process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL : window.location.origin}/banner-meta/get`,
+    method: 'GET'
   }
 }
 

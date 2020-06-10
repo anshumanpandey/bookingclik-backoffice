@@ -5,6 +5,7 @@ import DataTable from 'react-data-table-component';
 import { getBuyedBanner } from "../../crud/banners.crud";
 import { BuyBannerModal } from "./BuyBannerModal";
 import AxioHook from 'axios-hooks'
+import countries from "../../widgets/countryDropdown/countries.json"
 
 export default function Clients() {
     const [showModal, setShowModal] = useState(false);
@@ -19,19 +20,21 @@ export default function Clients() {
                 columns={[
                     {
                         name: 'Country',
-                        selector: 'country',
+                        selector: 'BannerMeta.country',
+                        cell: (r) => countries.find(i => i.code.toLocaleLowerCase() == r.BannerMetum.country.toLocaleLowerCase())?.name
                     },
                     {
                         name: 'Location',
-                        selector: 'location',
+                        selector: 'BannerMetum.locationName',
                     },
                     {
-                        name: 'Amount',
-                        selector: 'amount',
+                        name: 'From',
+                        cell: (r) => moment(r.availableFromDate).format('DD-MM-YYYY hh:mm A')
+
                     },
                     {
-                        name: 'Frequency',
-                        selector: 'paymentFrequency',
+                        name: 'To',
+                        cell: (r) => moment(r.availableToDate).format('DD-MM-YYYY hh:mm A')
                     },
                     {
                         name: 'User',

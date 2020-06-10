@@ -2,20 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from "react-bootstrap";
 import { TextField, } from "@material-ui/core"
 import { Formik, FieldArray, Field } from "formik";
-import moment from 'moment'
 import { updateBannerMetadata } from "../../crud/banners-meta.crud";
 import AxioHook from 'axios-hooks'
 import { connect } from "react-redux";
-import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
+
 import * as auth from "../../store/ducks/auth.duck";
 
 
 const CreateLocationComponent = ({ handleClose, bannerMetadata }) => {
-  const [dates, setDates] = useState([moment().startOf('month'), moment().endOf('month')])
-
   const [postReq, doPost] = AxioHook(updateBannerMetadata(), { manual: true })
-
 
   return (
     <Modal size="lg" show={true} onHide={() => handleClose('hide')}>
@@ -97,33 +92,6 @@ const CreateLocationComponent = ({ handleClose, bannerMetadata }) => {
                 helperText={touched.price && errors.price}
                 error={Boolean(touched.price && errors.price)}
               />
-
-              <MuiPickersUtilsProvider utils={MomentUtils}>
-                <div style={{ marginBottom: "8px", marginTop: "16px" }}>
-                  <DatePicker
-                    autoOk
-                    fullWidth
-                    label="From"
-                    value={dates[0]}
-                    onChange={(d) => setDates(p => [d, p[1]])}
-                    disableToolbar
-                    variant="inline"
-                  />
-                </div>
-
-                <div style={{ marginTop: "16px", marginBottom: "8px" }}>
-                  <DatePicker
-                    autoOk
-                    fullWidth
-                    label="To"
-                    value={dates[1]}
-                    onChange={(d) => setDates(p => [p[0], d])}
-                    disableToolbar
-                    variant="inline"
-                  />
-                </div>
-
-              </MuiPickersUtilsProvider>
 
               <div className="kt-login__actions">
                 <button

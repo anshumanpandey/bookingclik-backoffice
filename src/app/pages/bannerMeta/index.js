@@ -23,12 +23,12 @@ export default function Clients() {
                         selector: 'locationName',
                     },
                     {
-                        name: 'Available Amount',
+                        name: 'Available Banners',
                         selector: 'availableAmount',
                     },
                     {
                         name: 'Price',
-                        cell: (r) => `${r.price}£`
+                        cell: (r) => `${r.price}£/day`
                     },
                     {
                         name: 'Edit',

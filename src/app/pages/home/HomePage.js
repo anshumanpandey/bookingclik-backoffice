@@ -10,6 +10,7 @@ import Payments from "../payments"
 import BlacklistedCompanies from "../blacklistedCompanies"
 import Visitors from "../visitors"
 import BannerAdvertising from "../bannerAdvertising"
+import bannerMeta from "../bannerMeta"
 import Supplier from "../supplier"
 import { AddCreditsModal } from "../payments/AddCreditsModal"
 import { EditProfile } from "../supplier/EditProfile"
@@ -43,6 +44,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
     { path: "/bannerAdvertising", component: BannerAdvertising },    
     { path: "/blacklisted", component: BlacklistedCompanies },    
     { path: "/visitors", component: Visitors },    
+    { path: "/banner-meta", component: bannerMeta },    
   ]
 
   let defaultRoute = 'click';

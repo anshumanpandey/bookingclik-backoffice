@@ -46,6 +46,14 @@ export default {
         roles: ['super_admin'],
         desc: 'Map your codes to an IATA code'
       },
+      {
+        title: "Banners Config",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "banner-meta",
+        roles: ['super_admin'],
+        desc: 'Map your codes to an IATA code'
+      },
     ]
   }
 };

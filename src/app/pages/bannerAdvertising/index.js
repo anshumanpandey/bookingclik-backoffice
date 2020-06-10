@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FormControl, Button, InputLabel, Select, MenuItem, CircularProgress, Grid, Paper, Checkbox, FormControlLabel, Input, ListItemText } from "@material-ui/core"
+import { Button } from "@material-ui/core"
+import moment from 'moment'
 import DataTable from 'react-data-table-component';
 import { getBuyedBanner } from "../../crud/banners.crud";
 import { BuyBannerModal } from "./BuyBannerModal";
@@ -39,6 +40,7 @@ export default function Clients() {
                     {
                         name: 'Created At',
                         selector: 'createdAt',
+                        cell: (r) => moment(r.createdAt).format('DD-MM-YYYY hh:mm A')
                     },
                 ]}
                 actions={

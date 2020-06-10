@@ -34,6 +34,10 @@ export default function Clients() {
             selector: 'amount',
         },
         {
+            name: 'Item',
+            selector: 'buyedItem',
+        },
+        {
             name: 'Created at',
             selector: 'createdAt',
             //2020-06-03T05:29:26.000Z

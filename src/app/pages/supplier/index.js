@@ -9,6 +9,7 @@ import { PaymentModal } from './PaymentModal';
 import { ClickModal } from './ClickModal';
 import { CreateUserModal } from './CreateUserModal';
 import { EditSuppplier } from './EditSuppplier';
+import { EditPassword } from './EditPassword';
 import { CompaniesModal } from './CompaniesModal';
 import PaymentIcon from '@material-ui/icons/Payment';
 import MouseIcon from '@material-ui/icons/Mouse';
@@ -25,6 +26,7 @@ const SupplierComponent = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showCompanies, setShowCompanies] = useState(false);
+    const [showEditPassword, setShowEditPassword] = useState(false);
 
     const [clientsLocationReq, refetch] = AxioHook(getSupplier())
 
@@ -79,6 +81,17 @@ const SupplierComponent = () => {
             },
         },
         {
+            name: 'Edit Password',
+            cell: (r) => {
+                if (r.type == 'broker') {
+                    return <BusinessIcon onClick={() => {
+                        setShowEditPassword(r);
+                    }}/>
+                }
+                return <></>;
+            },
+        },
+        {
             name: 'Blacklisted Companies',
             cell: (r) => {
                 if (r.type == 'broker') {
@@ -88,7 +101,7 @@ const SupplierComponent = () => {
                 }
                 return <></>;
             },
-        }
+        },
     ];
 
 
@@ -134,6 +147,10 @@ const SupplierComponent = () => {
             {showCompanies && clientsLocationReq.data.find(i => i.id == showCompanies.id) && <CompaniesModal refetch={refetch} user={clientsLocationReq.data.find(i => i.id == showCompanies.id)} handleClose={() => setShowCompanies(false)} />}
             {showClickModal && <ClickModal  user={showClickModal} handleClose={() => setShowClickModal(false)} />}
             {showEditModal && <EditSuppplier  user={showEditModal} handleClose={(reason) => {
+                setShowEditModal(false)
+                if (reason == 'edited') refetch();
+            }} />}
+            {showEditPassword && <EditPassword  user={showEditPassword} handleClose={(reason) => {
                 setShowEditModal(false)
                 if (reason == 'edited') refetch();
             }} />}

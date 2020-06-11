@@ -188,6 +188,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                     )}
 
                     {arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
+                      let warning = null
                       let ocuppiedRange = []
                       const isFilled = arr.some(i => {
                         if (i.BannerPurchaseds.length == 0) {
@@ -207,9 +208,14 @@ const CreateLocationComponent = ({ handleClose }) => {
                         })
                       })
 
-                      let warning = null
-
-                      if (isFilled) {
+                      if (location.availableAmount == 0) {
+                        if (!location.error) arrayHelpers.replace(index, { ...location, error: true })
+                        warning = <p>
+                          Unfortunately banners are sold for this location. Please change your date range and book your banner ads.
+                          If you want these specific dates only please email admin@bookingclik.com
+                          and our team shall help you out with the purchase
+                        </p>
+                      } else if (isFilled) {
                         if (!location.error) arrayHelpers.replace(index, { ...location, error: true })
                         warning = <p>
                           Unfortunately banners are sold out between {ocuppiedRange[0].format(`DD-MM-YYYY hh:mm A`)}
@@ -220,7 +226,6 @@ const CreateLocationComponent = ({ handleClose }) => {
                       } else {
                         if (location.error) arrayHelpers.replace(index, { ...location, error: false })
                       }
-
                       return (
                         <>
                           <div style={{ display: 'flex' }}>

@@ -30,22 +30,11 @@ export const Routes = withRouter(({ history, ...oterh }) => {
     shallowEqual
   );
 
-  if (process.env.REACT_APP_SOON) {
-    return (
-      /* Create `LayoutContext` from current `history` and `menuConfig`. */
-      <LayoutContextProvider history={history} menuConfig={menuConfig}>
-        <Switch>
-          <Route path="/" component={ComingSoon} />
-        </Switch>
-      </LayoutContextProvider>
-    );
-
-  }
-
   return (
     /* Create `LayoutContext` from current `history` and `menuConfig`. */
     <LayoutContextProvider history={history} menuConfig={menuConfig}>
       <Switch>
+        { process.env.REACT_APP_SOON && <Route exact path="/" component={ComingSoon} />}
         {!isAuthorized ? (
           /* Render auth page when user at `/auth` and not authorized. */
           <AuthPage />
@@ -53,8 +42,6 @@ export const Routes = withRouter(({ history, ...oterh }) => {
           /* Otherwise redirect to root page (`/`) */
           <Redirect from="/auth" to={userLastLocation} />
         )}
-
-        { process.env.REACT_APP_SOON && <Route path="/" component={ComingSoon} />}
 
         <Route path="/error" component={ErrorsPage} />
         <Route path="/logout" component={LogoutPage} />

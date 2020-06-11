@@ -103,7 +103,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
             })
             .map(r => <Route key={r.path} path={r.path} component={r.component} />)}
         {/*<Redirect to="/error/error-v1" />*/}
-        <Redirect to="/" />
+        <Redirect to="/admin" />
       </Switch>
       {showModal && <AddCreditsModal handleClose={(reason) => {
         setShowModal(false)

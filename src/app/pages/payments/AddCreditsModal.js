@@ -38,11 +38,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                         label="Amount to add"
                         name="iataCode"
                         onChange={(e) => {
-                            if (e.target.value == "") {
-                                setAmount(0)
-                            } else {
-                                setAmount(e.target.value)
-                            }
+                            setAmount(e.target.value)
                         }}
                         value={amount}
                     />

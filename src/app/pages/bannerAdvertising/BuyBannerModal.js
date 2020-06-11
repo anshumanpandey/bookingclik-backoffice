@@ -27,6 +27,17 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     height: theme.spacing(7)
   },
+  selectAllItem: {
+    width: '90%',
+  },
+  closeManuItem: {
+    width: '10%',
+    float: 'right'
+  },
+  centeredMenuText: {
+    justifyContent: 'center',
+    display: 'flex',
+  },
 }));
 
 const BUY_UNITS = {
@@ -57,6 +68,7 @@ function resolvePrice(amountToBuy, frequency, isAirport) {
 
 
 const CreateLocationComponent = ({ handleClose }) => {
+  const [menuIsOpen, setMenuOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [perCountry, setPerCountry] = useState(null);
   const [countryArr, setCountryArray] = useState([]);
@@ -124,183 +136,214 @@ const CreateLocationComponent = ({ handleClose }) => {
 
               <FieldArray
                 name="selectedLocations"
-                render={arrayHelpers => (
-                  <div>
-                    {locationsReq.error && <p>Could not load the resource</p>}
-                    {locationsReq.loading && <CircularProgress />}
-                    {perCountry && (
-                      <div style={{ marginBottom: '1rem' }}>
-                        <FormControl style={{ width: '100%' }}>
-                          <InputLabel id="demo-simple-select-label">Country</InputLabel>
-                          <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            fullWidth
-                            defaultValue={countryArr[0]}
-                            onChange={(e) => {
-                              setSelectedCountry(e.target.value)
-                              arrayHelpers.form.setFieldValue("selectedLocations", [])
-                            }}
-                          >
-                            {countryArr.length !== 0 && (
-                              countryArr.map(c => {
-                                const country = countries.find(i => i.code.toLocaleLowerCase() == c.toLocaleLowerCase())?.name
-                                return <MenuItem key={c} value={c}>{country || c}</MenuItem>
-                              })
-                            )}
-                          </Select>
-                        </FormControl>
-                      </div>
-                    )}
+                render={arrayHelpers => {
+                  const onSelectChange = (array, extra) => {
+                    if (array.some(i => i == 'CLOSE')) {
+                      setMenuOpen(false)
+                      return
+                    }
+                    if (array.some(i => i == 'ALL')) array = perCountry[selectedCountry]
+                    if (array.some(i => i == 'NONE')) array = []
+                    
+                    const map = new Map();
+                    array
+                    .forEach((next) => {
+                      if (map.has(next.id)) {
+                        map.delete(next.id)
+                      } else {
+                        map.set(next.id, next)
+                      }
+                    })
 
-                    {selectedCountry && (
-                      <div style={{ marginBottom: '1rem' }}>
-                        <FormControl style={{ width: '100%' }}>
-                          <InputLabel id="demo-mutiple-name-label">Locations</InputLabel>
-                          <Select
-                            labelId="demo-mutiple-name-label"
-                            multiple
-                            value={arrayHelpers.form.values.selectedLocations}
-                            input={<Input />}
-                            renderValue={(selected) => selected.map(i => i.locationName).join(', ')}
-                            onChange={(e) => {
-                              const newElement = e.target.value[e.target.value.length - 1]
+                    const objs = []
+                    Array.from(map.values())
+                    .forEach((location) => {
+                      objs.push({ ...location, error: false, fromDate: moment().startOf('day'), toDate: moment().add('day', 1).endOf('day') })
+                    })
 
-                              const foundIdx = arrayHelpers.form.values.selectedLocations.findIndex(p => p.locationName == newElement.locationName)
-                              if (foundIdx !== -1) {
-                                return arrayHelpers.remove(foundIdx)
-                              }
-                              arrayHelpers.push({ ...newElement, error: false,fromDate: moment().startOf('day'), toDate: moment().add('day', 1).endOf('day') })
+                    arrayHelpers.form.setFieldValue("selectedLocations", [...objs])
+                  }
+                  return (
+                    <div>
+                      {locationsReq.error && <p>Could not load the resource</p>}
+                      {locationsReq.loading && <CircularProgress />}
+                      {perCountry && (
+                        <div style={{ marginBottom: '1rem' }}>
+                          <FormControl style={{ width: '100%' }}>
+                            <InputLabel id="demo-simple-select-label">Country</InputLabel>
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              fullWidth
+                              defaultValue={countryArr[0]}
+                              onChange={(e) => {
+                                setSelectedCountry(e.target.value)
+                                arrayHelpers.form.setFieldValue("selectedLocations", [])
+                              }}
+                            >
+                              {countryArr.length !== 0 && (
+                                countryArr.map(c => {
+                                  const country = countries.find(i => i.code.toLocaleLowerCase() == c.toLocaleLowerCase())?.name
+                                  return <MenuItem key={c} value={c}>{country || c}</MenuItem>
+                                })
+                              )}
+                            </Select>
+                          </FormControl>
+                        </div>
+                      )}
 
-                            }}
-                          >
-                            {perCountry[selectedCountry].map((c) => {
-                              return (
-                                <MenuItem key={c} value={c} >
+                      {selectedCountry && (
+                        <div style={{ marginBottom: '1rem' }}>
+                          <FormControl style={{ width: '100%' }}>
+                            <InputLabel id="demo-mutiple-name-label">Locations</InputLabel>
+                            <Select
+                              labelId="demo-mutiple-name-label"
+                              open={menuIsOpen}
+                              onClose={() => setMenuOpen(false)}
+                              onOpen={() => setMenuOpen(true)}
+                              multiple
+                              value={arrayHelpers.form.values.selectedLocations}
+                              input={<Input />}
+                              renderValue={(selected) => selected.map(i => i.locationName).join(', ')}
+                              onChange={(e, t) => {
+                                onSelectChange(e.target.value, t)
+                              }}
+                            >
+                              <MenuItem classes={{ root: classes.closeManuItem }} value={'CLOSE'} >
+                                  <ListItemText classes={{ root: classes.centeredMenuText }} primary={'X'} />
+                              </MenuItem>
+                              <MenuItem classes={{ root: classes.selectAllItem }} value={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'NONE':'ALL'} >
+                                  <ListItemText
+                                    primary={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'UNSELECT ALL' :'SELECT ALL'}
+                                  />
+                              </MenuItem>
+                              {perCountry[selectedCountry].map((c, idx, arr) => {
+                                return (
+                                  <MenuItem key={c.id} value={c}>
                                   <Checkbox checked={arrayHelpers.form.values.selectedLocations.find(i => i.locationName == c.locationName) !== undefined} />
                                   <ListItemText primary={c.locationName} />
                                 </MenuItem>
-                              );
-                            })}
-                          </Select>
-                        </FormControl>
-                      </div>
-                    )}
+                                );
+                              })}
+                            </Select>
+                          </FormControl>
+                        </div>
+                      )}
 
-                    {arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
-                      let warning = null
-                      let ocuppiedRange = []
-                      const isFilled = arr.some(i => {
-                        if (i.BannerPurchaseds.length == 0) {
-                          return false
-                        }
+                      {arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
+                        let warning = null
+                        let ocuppiedRange = []
+                        const isFilled = arr.some(i => {
+                          if (i.BannerPurchaseds.length == 0) {
+                            return false
+                          }
 
 
-                        return i.BannerPurchaseds.some(purchasedBanner => {
-                          const availableFromDate = moment(purchasedBanner.availableFromDate)
-                          const availableToDate = moment(purchasedBanner.availableToDate)
-                          const isBetween = i.fromDate.isBetween(availableFromDate, availableToDate, undefined, '[]') ||
-                            i.toDate.isBetween(availableFromDate, availableToDate, undefined, '[]');
-                          const isInside = availableFromDate.isBetween(i.fromDate, i.toDate, undefined, '[]') ||
-                            availableToDate.isBetween(i.fromDate, i.toDate, undefined, '[]');
-                          if (isBetween || isInside) ocuppiedRange = [availableFromDate, availableToDate]
-                          return (isBetween || isInside) && location.locationName == i.locationName
+                          return i.BannerPurchaseds.some(purchasedBanner => {
+                            const availableFromDate = moment(purchasedBanner.availableFromDate)
+                            const availableToDate = moment(purchasedBanner.availableToDate)
+                            const isBetween = i.fromDate.isBetween(availableFromDate, availableToDate, undefined, '[]') ||
+                              i.toDate.isBetween(availableFromDate, availableToDate, undefined, '[]');
+                            const isInside = availableFromDate.isBetween(i.fromDate, i.toDate, undefined, '[]') ||
+                              availableToDate.isBetween(i.fromDate, i.toDate, undefined, '[]');
+                            if (isBetween || isInside) ocuppiedRange = [availableFromDate, availableToDate]
+                            return (isBetween || isInside) && location.locationName == i.locationName
+                          })
                         })
-                      })
 
-                      if (location.availableAmount == 0) {
-                        if (!location.error) arrayHelpers.replace(index, { ...location, error: true })
-                        warning = <p>
-                          Unfortunately banners are sold for this location. Please change your date range and book your banner ads.
-                          If you want these specific dates only please email admin@bookingclik.com
-                          and our team shall help you out with the purchase
+                        if (location.availableAmount == 0) {
+                          if (!location.error) arrayHelpers.replace(index, { ...location, error: true })
+                          warning = <p>
+                            Unfortunately banners are sold for this location. Please change your date range and book your banner ads.
+                            If you want these specific dates only please email admin@bookingclik.com
+                            and our team shall help you out with the purchase
                         </p>
-                      } else if (isFilled) {
-                        if (!location.error) arrayHelpers.replace(index, { ...location, error: true })
-                        warning = <p>
-                          Unfortunately banners are sold out between {ocuppiedRange[0].format(`DD-MM-YYYY hh:mm A`)}
+                        } else if (isFilled) {
+                          if (!location.error) arrayHelpers.replace(index, { ...location, error: true })
+                          warning = <p>
+                            Unfortunately banners are sold out between {ocuppiedRange[0].format(`DD-MM-YYYY hh:mm A`)}
                           and {ocuppiedRange[1].format(`DD-MM-YYYY hh:mm A`)}. Please change your date range and book your banner ads.
                           If you want these specific dates only please email admin@bookingclik.com
                           and our team shall help you out with the purchase
                         </p>
-                      } else {
-                        if (location.error) arrayHelpers.replace(index, { ...location, error: false })
-                      }
-                      return (
-                        <>
-                          <div style={{ display: 'flex' }}>
-                            <div style={{ flex: 1, display: 'flex', }}>
-                              <Input style={{ alignSelf: 'end' }} disabled={true} value={location.locationName} />
+                        } else {
+                          if (location.error) arrayHelpers.replace(index, { ...location, error: false })
+                        }
+                        return (
+                          <>
+                            <div style={{ display: 'flex' }}>
+                              <div style={{ flex: 1, display: 'flex', }}>
+                                <Input style={{ alignSelf: 'end' }} disabled={true} value={location.locationName} />
+                              </div>
+
+                              <div style={{ flex: 3, display: 'flex' }}>
+                                <MuiPickersUtilsProvider utils={MomentUtils}>
+                                  <DatePicker
+                                    style={{ flex: 1 }}
+                                    autoOk
+                                    label="From"
+                                    value={location.fromDate}
+                                    onChange={(d) => {
+                                      if (location.toDate.isBefore(d)) {
+                                        arrayHelpers.replace(index, location)
+                                      } else {
+                                        arrayHelpers.replace(index, { ...location, fromDate: d })
+                                      }
+                                    }}
+                                    disableToolbar
+                                    variant="inline"
+                                  />
+
+                                  <DatePicker
+                                    style={{ flex: 1 }}
+                                    autoOk
+                                    label="To"
+                                    value={location.toDate}
+                                    onChange={(d) => {
+                                      if (location.fromDate.isAfter(d)) {
+                                        arrayHelpers.replace(index, location)
+                                      } else {
+                                        arrayHelpers.replace(index, { ...location, toDate: d })
+                                      }
+                                    }}
+                                    disableToolbar
+                                    variant="inline"
+                                  />
+
+                                </MuiPickersUtilsProvider>
+                              </div>
+
+                              <div style={{ display: 'flex', flex: '0.2', justifyContent: 'center' }}>
+                                <h5 style={{ alignSelf: 'end', margin: 0 }}>=</h5>
+                              </div>
+
+                              <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center' }}>
+                                <h5 style={{ alignSelf: 'end', margin: 0 }}>{location.toDate.diff(location.fromDate, 'days') * location.price} £</h5>
+                              </div>
+
+                              <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center', alignItems: 'end', cursor: 'pointer' }}>
+                                <DeleteIcon onClick={() => arrayHelpers.remove(index)} />
+                              </div>
+
                             </div>
+                            <div>{warning}</div>
+                          </>
+                        );
+                      })}
 
-                            <div style={{ flex: 3, display: 'flex' }}>
-                              <MuiPickersUtilsProvider utils={MomentUtils}>
-                                <DatePicker
-                                  style={{ flex: 1 }}
-                                  autoOk
-                                  label="From"
-                                  value={location.fromDate}
-                                  onChange={(d) => {
-                                    if (location.toDate.isBefore(d)) {
-                                      arrayHelpers.replace(index, location)
-                                    } else {
-                                      arrayHelpers.replace(index, { ...location, fromDate: d })
-                                    }
-                                  }}
-                                  disableToolbar
-                                  variant="inline"
-                                />
-
-                                <DatePicker
-                                  style={{ flex: 1 }}
-                                  autoOk
-                                  label="To"
-                                  value={location.toDate}
-                                  onChange={(d) => {
-                                    if (location.fromDate.isAfter(d)) {
-                                      arrayHelpers.replace(index, location)
-                                    } else {
-                                      arrayHelpers.replace(index, { ...location, toDate: d })
-                                    }
-                                  }}
-                                  disableToolbar
-                                  variant="inline"
-                                />
-
-                              </MuiPickersUtilsProvider>
-                            </div>
-
-                            <div style={{ display: 'flex', flex: '0.2', justifyContent: 'center' }}>
-                              <h5 style={{ alignSelf: 'end', margin: 0 }}>=</h5>
-                            </div>
-
-                            <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center' }}>
-                              <h5 style={{ alignSelf: 'end', margin: 0 }}>{location.toDate.diff(location.fromDate, 'days') * location.price} £</h5>
-                            </div>
-
-                            <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center', alignItems: 'end', cursor: 'pointer'}}>
-                              <DeleteIcon onClick={() => arrayHelpers.remove(index)} />
-                            </div>
-
-                          </div>
-                          <div>{warning}</div>
-                        </>
-                      );
-                    })}
-
-                    {arrayHelpers.form.values.selectedLocations.length !== 0 && (
-                      <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                        <Paper className={classes.paper}>
-                          <div>{arrayHelpers.form.values.selectedLocations.length} locations selected</div>
+                      {arrayHelpers.form.values.selectedLocations.length !== 0 && (
+                        <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                          <Paper className={classes.paper}>
+                            <div>{arrayHelpers.form.values.selectedLocations.length} locations selected</div>
                               Total: {arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                            totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
-                            return totalToPay
-                          }, 0)} £
+                              totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
+                              return totalToPay
+                            }, 0)} £
                           </Paper>
-                      </div>
-                    )}
+                        </div>
+                      )}
 
-                    {arrayHelpers.form.values.selectedLocations.length !== 0 && !arrayHelpers.form.values.selectedLocations.some(l => l.error) &&(
+                      {arrayHelpers.form.values.selectedLocations.length !== 0 && !arrayHelpers.form.values.selectedLocations.some(l => l.error) && (
                         <PayPalButton
                           createOrder={(data, actions) => {
                             const totalToPay = arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
@@ -362,10 +405,11 @@ const CreateLocationComponent = ({ handleClose }) => {
                             currency: 'GBP'
                           }}
                         />
-                    )}
+                      )}
 
-                  </div>
-                )}
+                    </div>
+                  )
+                }}
               />
 
             </form>

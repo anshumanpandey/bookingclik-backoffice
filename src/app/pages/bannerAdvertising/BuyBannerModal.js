@@ -16,6 +16,7 @@ import DataTable from 'react-data-table-component';
 import { DesktopDateRangePicker, DateRange, DateRangeDelimiter, LocalizationProvider } from "next-material-picker";
 import Stepper from '@material-ui/core/Stepper';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { DropzoneArea } from 'material-ui-dropzone'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -43,6 +44,9 @@ const useStyles = makeStyles((theme) => ({
   dateInput: {
     width: '100%',
   },
+  dropzoneTextContainer: {
+    padding: '1rem'
+  }
 }));
 
 const BUY_UNITS = {
@@ -52,7 +56,7 @@ const BUY_UNITS = {
 }
 
 function getSteps() {
-  return ['Date', 'Location', 'Configure','Review','Payment'];
+  return ['Date', 'Location', 'Configure', 'Review', 'Payment'];
 }
 
 const STEPS_ENUM = {
@@ -87,13 +91,14 @@ function resolvePrice(amountToBuy, frequency, isAirport) {
 const CreateLocationComponent = ({ handleClose }) => {
   const [isSelectingDate, setIsSelectingDate] = useState(false);
   const [selectedDate, handleDateChange] = useState([null, null]);
+  const [bannerImages, setBannersImages] = useState([null, null]);
   const [menuIsOpen, setMenuOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [perCountry, setPerCountry] = useState(null);
   const [countryArr, setCountryArray] = useState([]);
   const [locationsReq, refetch] = AxioHook(getLocations())
   const [selectedLocations, setSelectedLocations] = useState([]);
-  const [activeStep, setActiveStep] = useState(STEPS_ENUM.DATE);
+  const [activeStep, setActiveStep] = useState(STEPS_ENUM.CONFIGURE);
   const classes = useStyles();
 
   const [stepOneDone, setStepOneDone] = useState(false);
@@ -178,9 +183,9 @@ const CreateLocationComponent = ({ handleClose }) => {
                 name="selectedLocations"
                 render={arrayHelpers => {
                   const resolveNextButtonDisabledStatus = () => {
-                    if (activeStep == STEPS_ENUM.DATE && selectedDate[0] == null && selectedDate[1] == null)  return true
-                    if (activeStep == STEPS_ENUM.LOCATION && arrayHelpers.form.values.selectedLocations.length == 0)  return true
-                
+                    if (activeStep == STEPS_ENUM.DATE && selectedDate[0] == null && selectedDate[1] == null) return true
+                    if (activeStep == STEPS_ENUM.LOCATION && arrayHelpers.form.values.selectedLocations.length == 0) return true
+
                     return false
                   }
 
@@ -301,7 +306,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                               </div>
                             )}
 
-                            {selectedCountry && selectedDate[0] !== null && selectedDate[1] !== null && (
+                            {selectedCountry && (
                               <>
                                 <div style={{ marginBottom: '1rem' }}>
                                   <DataTable
@@ -326,12 +331,68 @@ const CreateLocationComponent = ({ handleClose }) => {
                                       .filter(i => i.availableAmount != 0)}
                                   />
                                 </div>
-
-
                               </>
                             )}
                           </>
                         )}
+
+                        {activeStep == STEPS_ENUM.CONFIGURE && (
+                          <div style={{ marginBottom: '1rem' }}>
+                            <div style={{ flex: 1, display: 'flex', marginBottom: '1rem' }}>
+                              <TextField fullWidth style={{ alignSelf: 'end' }} label={'URL'} />
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                              <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                              }}>
+                                <input
+                                  accept="image/*"
+                                  className={classes.input}
+                                  style={{ display: 'none' }}
+                                  id="raised-button-file-desktop"
+                                  onChange={({ target }) => {
+                                    console.log(target.files)
+                                    setBannersImages(p => [target.files[0], p[1]])
+                                  }}
+                                  type="file"
+                                />
+                                <label htmlFor="raised-button-file-desktop">
+                                  <Button color={"primary"} variant="container" component="span">
+                                    Upload desktop banner image
+                                  </Button>
+                                </label>
+                                {bannerImages[0] && <img style={{ width: 300 }} src={URL.createObjectURL(bannerImages[0])} />}
+                              </div>
+                              <div style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                              }}>
+                                <input
+                                  accept="image/*"
+                                  className={classes.input}
+                                  style={{ display: 'none' }}
+                                  id="raised-button-file-mobile"
+                                  onChange={({ target }) => {
+                                    console.log(target.files)
+                                    setBannersImages(p => [p[0], target.files[0] ])
+                                  }}
+                                  type="file"
+                                />
+                                <label htmlFor="raised-button-file-mobile">
+                                  <Button color={"primary"} variant="container" component="span">
+                                    Upload mobile banner image
+                                  </Button>
+                                </label>
+                                {bannerImages[1] && <img style={{ width: 300 }} src={URL.createObjectURL(bannerImages[1])} />}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
 
 
                         {activeStep == STEPS_ENUM.REVIEW && selectedDate[0] !== null && selectedDate[1] !== null && arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
@@ -478,17 +539,17 @@ const CreateLocationComponent = ({ handleClose }) => {
                             />
                           )}
 
-                          <div style={{ display: 'flex', justifyContent: 'end' }}>
-                            <Button
-                              disabled={activeStep === STEPS_ENUM.DATE}
-                              onClick={handleBack}
-                            >
-                              Back
+                        <div style={{ display: 'flex', justifyContent: 'end' }}>
+                          <Button
+                            disabled={activeStep === STEPS_ENUM.DATE}
+                            onClick={handleBack}
+                          >
+                            Back
               </Button>
-                            <Button disabled={resolveNextButtonDisabledStatus()} variant="contained" color="primary" onClick={handleNext} >
-                              {activeStep === steps.length - 1 ? 'Pay' : 'Next'}
-                            </Button>
-                          </div>
+                          <Button disabled={resolveNextButtonDisabledStatus()} variant="contained" color="primary" onClick={handleNext} >
+                            {activeStep === steps.length - 1 ? 'Pay' : 'Next'}
+                          </Button>
+                        </div>
 
                       </div>
                     </>

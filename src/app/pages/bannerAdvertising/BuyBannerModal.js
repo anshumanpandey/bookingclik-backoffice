@@ -96,7 +96,11 @@ const CreateLocationComponent = ({ handleClose }) => {
         return json;
       }, {})
       setPerCountry(list)
-      setCountryArray(Object.keys(list))
+      setCountryArray(Object.keys(list).sort(function (a, b) {
+        if (a < b) { return -1; }
+        if (a > b) { return 1; }
+        return 0;
+      }))
       setSelectedCountry(Object.keys(list)[0])
     }
   }, [locationsReq.loading])
@@ -149,22 +153,22 @@ const CreateLocationComponent = ({ handleClose }) => {
                     }
                     if (array.some(i => i == 'ALL')) array = perCountry[selectedCountry]
                     if (array.some(i => i == 'NONE')) array = []
-                    
+
                     const map = new Map();
                     array
-                    .forEach((next) => {
-                      if (map.has(next.id)) {
-                        map.delete(next.id)
-                      } else {
-                        map.set(next.id, next)
-                      }
-                    })
+                      .forEach((next) => {
+                        if (map.has(next.id)) {
+                          map.delete(next.id)
+                        } else {
+                          map.set(next.id, next)
+                        }
+                      })
 
                     const objs = []
                     Array.from(map.values())
-                    .forEach((location) => {
-                      objs.push({ ...location, error: false, fromDate: null, toDate: null })
-                    })
+                      .forEach((location) => {
+                        objs.push({ ...location, error: false, fromDate: null, toDate: null })
+                      })
 
                     arrayHelpers.form.setFieldValue("selectedLocations", [...objs])
                   }
@@ -187,10 +191,11 @@ const CreateLocationComponent = ({ handleClose }) => {
                               }}
                             >
                               {countryArr.length !== 0 && (
-                                countryArr.map(c => {
-                                  const country = countries.find(i => i.code.toLocaleLowerCase() == c.toLocaleLowerCase())?.name
-                                  return <MenuItem key={c} value={c}>{country || c}</MenuItem>
-                                })
+                                countryArr
+                                  .map(c => {
+                                    const country = countries.find(i => i.code.toLocaleLowerCase() == c.toLocaleLowerCase())?.name
+                                    return <MenuItem key={c} value={c}>{country || c}</MenuItem>
+                                  })
                               )}
                             </Select>
                           </FormControl>
@@ -207,7 +212,11 @@ const CreateLocationComponent = ({ handleClose }) => {
                               onClose={() => setMenuOpen(false)}
                               onOpen={() => setMenuOpen(true)}
                               multiple
-                              value={arrayHelpers.form.values.selectedLocations}
+                              value={arrayHelpers.form.values.selectedLocations.sort(function (a, b) {
+                                if (a.locationName < b.locationName) { return -1; }
+                                if (a.locationName > b.locationName) { return 1; }
+                                return 0;
+                              })}
                               input={<Input />}
                               renderValue={(selected) => selected.map(i => i.locationName).join(', ')}
                               onChange={(e, t) => {
@@ -215,19 +224,19 @@ const CreateLocationComponent = ({ handleClose }) => {
                               }}
                             >
                               <MenuItem classes={{ root: classes.closeManuItem }} value={'CLOSE'} >
-                                  <ListItemText classes={{ root: classes.centeredMenuText }} primary={'X'} />
+                                <ListItemText classes={{ root: classes.centeredMenuText }} primary={'X'} />
                               </MenuItem>
-                              <MenuItem classes={{ root: classes.selectAllItem }} value={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'NONE':'ALL'} >
-                                  <ListItemText
-                                    primary={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'UNSELECT ALL' :'SELECT ALL'}
-                                  />
+                              <MenuItem classes={{ root: classes.selectAllItem }} value={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'NONE' : 'ALL'} >
+                                <ListItemText
+                                  primary={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'UNSELECT ALL' : 'SELECT ALL'}
+                                />
                               </MenuItem>
                               {perCountry[selectedCountry].map((c, idx, arr) => {
                                 return (
                                   <MenuItem key={c.id} value={c}>
-                                  <Checkbox checked={arrayHelpers.form.values.selectedLocations.find(i => i.locationName == c.locationName) !== undefined} />
-                                  <ListItemText primary={c.locationName} />
-                                </MenuItem>
+                                    <Checkbox checked={arrayHelpers.form.values.selectedLocations.find(i => i.locationName == c.locationName) !== undefined} />
+                                    <ListItemText primary={c.locationName} />
+                                  </MenuItem>
                                 );
                               })}
                             </Select>
@@ -283,39 +292,39 @@ const CreateLocationComponent = ({ handleClose }) => {
                               </div>
 
                               <div style={{ flex: 3, display: 'flex' }}>
-                              <LocalizationProvider dateAdapter={MomentUtils}>
-                              <DesktopDateRangePicker
-                              className="date-range"
-                              inputFormat="DD-MM-YYYY"
-      startText="From"
-      endText="To"
-      open={isSelectingDate}
-      onChange={() => {}}
-      onOpen={() => setIsSelectingDate(true)}
-      value={[location.fromDate,location.toDate]}
-      okText={"YEs"}
-      disablePast={true}
-      onAccept={(datePair) => {
-        arrayHelpers.replace(index, { ...location, fromDate: datePair[0] ? datePair[0]: location.fromDate, toDate: datePair[1] ? datePair[1]: location.toDate})
-        setIsSelectingDate(false)
-      }}
-      renderInput={(startProps, endProps) => {
-        delete startProps.variant
-        delete startProps.helperText
-        
-        delete endProps.variant
-        delete endProps.helperText
+                                <LocalizationProvider dateAdapter={MomentUtils}>
+                                  <DesktopDateRangePicker
+                                    className="date-range"
+                                    inputFormat="DD-MM-YYYY"
+                                    startText="From"
+                                    endText="To"
+                                    open={isSelectingDate}
+                                    onChange={() => { }}
+                                    onOpen={() => setIsSelectingDate(true)}
+                                    value={[location.fromDate, location.toDate]}
+                                    okText={"YEs"}
+                                    disablePast={true}
+                                    onAccept={(datePair) => {
+                                      arrayHelpers.replace(index, { ...location, fromDate: datePair[0] ? datePair[0] : location.fromDate, toDate: datePair[1] ? datePair[1] : location.toDate })
+                                      setIsSelectingDate(false)
+                                    }}
+                                    renderInput={(startProps, endProps) => {
+                                      delete startProps.variant
+                                      delete startProps.helperText
 
-        return (
-          <>
-            <TextField classes={{ root: classes.dateInput }} {...startProps} />
-            <DateRangeDelimiter> to </DateRangeDelimiter>
-            <TextField classes={{ root: classes.dateInput }} {...endProps} />
-          </>
-        );
-      }}
-    />
-    </LocalizationProvider>
+                                      delete endProps.variant
+                                      delete endProps.helperText
+
+                                      return (
+                                        <>
+                                          <TextField classes={{ root: classes.dateInput }} {...startProps} />
+                                          <DateRangeDelimiter> to </DateRangeDelimiter>
+                                          <TextField classes={{ root: classes.dateInput }} {...endProps} />
+                                        </>
+                                      );
+                                    }}
+                                  />
+                                </LocalizationProvider>
                               </div>
 
                               <div style={{ display: 'flex', flex: '0.2', justifyContent: 'center' }}>
@@ -337,86 +346,86 @@ const CreateLocationComponent = ({ handleClose }) => {
                       })}
 
                       {arrayHelpers.form.values.selectedLocations.length !== 0 &&
-                      arrayHelpers.form.values.selectedLocations.every(i => i.fromDate !== null && i.toDate !== null)
-                      && (
-                        <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-                          <Paper className={classes.paper}>
-                            <div>{arrayHelpers.form.values.selectedLocations.length} locations selected</div>
+                        arrayHelpers.form.values.selectedLocations.every(i => i.fromDate !== null && i.toDate !== null)
+                        && (
+                          <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+                            <Paper className={classes.paper}>
+                              <div>{arrayHelpers.form.values.selectedLocations.length} locations selected</div>
                               Total: {arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                              totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
-                              return totalToPay
-                            }, 0)} £
+                                totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
+                                return totalToPay
+                              }, 0)} £
                           </Paper>
-                        </div>
-                      )}
+                          </div>
+                        )}
 
                       {
-                      arrayHelpers.form.values.selectedLocations.length !== 0 &&
-                      !arrayHelpers.form.values.selectedLocations.some(l => l.error) &&
-                      arrayHelpers.form.values.selectedLocations.every(i => i.fromDate !== null && i.toDate !== null)
-                      && (
-                        <PayPalButton
-                          createOrder={(data, actions) => {
-                            const totalToPay = arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                              totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
-                              return totalToPay
-                            }, 0).toFixed(2)
+                        arrayHelpers.form.values.selectedLocations.length !== 0 &&
+                        !arrayHelpers.form.values.selectedLocations.some(l => l.error) &&
+                        arrayHelpers.form.values.selectedLocations.every(i => i.fromDate !== null && i.toDate !== null)
+                        && (
+                          <PayPalButton
+                            createOrder={(data, actions) => {
+                              const totalToPay = arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
+                                totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
+                                return totalToPay
+                              }, 0).toFixed(2)
 
-                            const payData = {
-                              intent: "CAPTURE",
-                              purchase_units: [{
-                                amount: {
-                                  currency_code: "GBP",
-                                  value: totalToPay,
-                                  breakdown: {
-                                    item_total: {
-                                      currency_code: 'GBP',
-                                      value: totalToPay
+                              const payData = {
+                                intent: "CAPTURE",
+                                purchase_units: [{
+                                  amount: {
+                                    currency_code: "GBP",
+                                    value: totalToPay,
+                                    breakdown: {
+                                      item_total: {
+                                        currency_code: 'GBP',
+                                        value: totalToPay
+                                      }
                                     }
-                                  }
-                                },
-                                items: arrayHelpers.form.values.selectedLocations.map((i) => {
+                                  },
+                                  items: arrayHelpers.form.values.selectedLocations.map((i) => {
+                                    return {
+                                      name: `banner to be displayed on bookingclik.com during ${i.amount} ${i.frequency}s for ${i.locationName}`,
+                                      quantity: 1,
+                                      unit_amount: {
+                                        currency_code: "GBP",
+                                        value: resolvePrice(i.amount, i.frequency, i.locationName.match(/(Airport)/)).toFixed(2),
+                                      },
+                                    }
+                                  }),
+                                }],
+                              }
+                              return actions.order.create(payData);
+                            }}
+                            amount={
+                              arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
+                                totalToPay += resolvePrice(next.amount, next.frequency, next.locationName.match(/(Airport)/))
+                                return totalToPay
+                              }, 0)
+                            }
+                            onSuccess={(details, paypalData) => {
+                              const data = {
+                                orderId: paypalData.orderID,
+                                selectedLocations: arrayHelpers.form.values.selectedLocations.map((l) => {
                                   return {
-                                    name: `banner to be displayed on bookingclik.com during ${i.amount} ${i.frequency}s for ${i.locationName}`,
-                                    quantity: 1,
-                                    unit_amount: {
-                                      currency_code: "GBP",
-                                      value: resolvePrice(i.amount, i.frequency, i.locationName.match(/(Airport)/)).toFixed(2),
-                                    },
+                                    ...l,
+                                    fromDate: l.fromDate.unix(),
+                                    toDate: l.toDate.unix()
                                   }
                                 }),
-                              }],
-                            }
-                            return actions.order.create(payData);
-                          }}
-                          amount={
-                            arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                              totalToPay += resolvePrice(next.amount, next.frequency, next.locationName.match(/(Airport)/))
-                              return totalToPay
-                            }, 0)
-                          }
-                          onSuccess={(details, paypalData) => {
-                            const data = {
-                              orderId: paypalData.orderID,
-                              selectedLocations: arrayHelpers.form.values.selectedLocations.map((l) => {
-                                return {
-                                  ...l,
-                                  fromDate: l.fromDate.unix(),
-                                  toDate: l.toDate.unix()
-                                }
-                              }),
-                            };
-                            doPost({ data })
-                              .then(() => {
-                                handleClose();
-                              })
-                          }}
-                          options={{
-                            clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A",
-                            currency: 'GBP'
-                          }}
-                        />
-                      )}
+                              };
+                              doPost({ data })
+                                .then(() => {
+                                  handleClose();
+                                })
+                            }}
+                            options={{
+                              clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A",
+                              currency: 'GBP'
+                            }}
+                          />
+                        )}
 
                     </div>
                   )

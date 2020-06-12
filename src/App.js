@@ -9,6 +9,8 @@ import { PersistGate } from "redux-persist/integration/react";
 import { LastLocationProvider } from "react-router-last-location";
 import { Routes } from "./app/router/Routes";
 import { I18nProvider, LayoutSplashScreen, ThemeProvider } from "./_metronic";
+import { DesktopDateRangePicker, DateRange, DateRangeDelimiter, LocalizationProvider } from "next-material-picker";
+import MomentUtils from 'next-material-picker/adapter/moment';
 
 export default function App({ store, persistor, basename }) {
   return (
@@ -27,7 +29,9 @@ export default function App({ store, persistor, basename }) {
                 {/* Provide `react-intl` context synchronized with Redux state.  */}
                 <I18nProvider>
                   {/* Render routes with provided `Layout`. */}
-                  <Routes />
+                  <LocalizationProvider dateAdapter={MomentUtils}>
+                    <Routes />
+                  </LocalizationProvider>
                 </I18nProvider>
               </ThemeProvider>
             </LastLocationProvider>

@@ -73,6 +73,7 @@ function resolvePrice(amountToBuy, frequency, isAirport) {
 
 const CreateLocationComponent = ({ handleClose }) => {
   const [isSelectingDate, setIsSelectingDate] = useState(false);
+  const [selectedDate, handleDateChange] = useState([null, null]);
   const [menuIsOpen, setMenuOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [perCountry, setPerCountry] = useState(null);
@@ -244,7 +245,42 @@ const CreateLocationComponent = ({ handleClose }) => {
                         </div>
                       )}
 
-                      {arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
+                      {selectedCountry && (
+                        <div style={{ marginBottom: '1rem' }}>
+                          <DesktopDateRangePicker
+                            className="date-range"
+                            inputFormat="DD-MM-YYYY"
+                            startText="From"
+                            endText="To"
+                            open={isSelectingDate}
+                            onChange={() => { }}
+                            onOpen={() => setIsSelectingDate(true)}
+                            value={selectedDate}
+                            disablePast={true}
+                            onAccept={(datePair) => {
+                              handleDateChange(datePair)
+                              setIsSelectingDate(false)
+                            }}
+                            renderInput={(startProps, endProps) => {
+                              delete startProps.variant
+                              delete startProps.helperText
+
+                              delete endProps.variant
+                              delete endProps.helperText
+
+                              return (
+                                <>
+                                  <TextField classes={{ root: classes.dateInput }} {...startProps} />
+                                  <DateRangeDelimiter> to </DateRangeDelimiter>
+                                  <TextField classes={{ root: classes.dateInput }} {...endProps} />
+                                </>
+                              );
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {selectedDate[0] !== null && selectedDate[1] !== null && arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
                         let warning = null
                         let ocuppiedRange = []
                         const locationWithDatesAssigned = arr.filter(i => i.fromDate && i.toDate);
@@ -292,39 +328,37 @@ const CreateLocationComponent = ({ handleClose }) => {
                               </div>
 
                               <div style={{ flex: 3, display: 'flex' }}>
-                                <LocalizationProvider dateAdapter={MomentUtils}>
-                                  <DesktopDateRangePicker
-                                    className="date-range"
-                                    inputFormat="DD-MM-YYYY"
-                                    startText="From"
-                                    endText="To"
-                                    open={isSelectingDate}
-                                    onChange={() => { }}
-                                    onOpen={() => setIsSelectingDate(true)}
-                                    value={[location.fromDate, location.toDate]}
-                                    okText={"YEs"}
-                                    disablePast={true}
-                                    onAccept={(datePair) => {
-                                      arrayHelpers.replace(index, { ...location, fromDate: datePair[0] ? datePair[0] : location.fromDate, toDate: datePair[1] ? datePair[1] : location.toDate })
-                                      setIsSelectingDate(false)
-                                    }}
-                                    renderInput={(startProps, endProps) => {
-                                      delete startProps.variant
-                                      delete startProps.helperText
+                                {/*<DesktopDateRangePicker
+                                  className="date-range"
+                                  inputFormat="DD-MM-YYYY"
+                                  startText="From"
+                                  endText="To"
+                                  open={isSelectingDate}
+                                  onChange={() => { }}
+                                  onOpen={() => setIsSelectingDate(true)}
+                                  value={[location.fromDate, location.toDate]}
+                                  okText={"YEs"}
+                                  disablePast={true}
+                                  onAccept={(datePair) => {
+                                    arrayHelpers.replace(index, { ...location, fromDate: datePair[0] ? datePair[0] : location.fromDate, toDate: datePair[1] ? datePair[1] : location.toDate })
+                                    setIsSelectingDate(false)
+                                  }}
+                                  renderInput={(startProps, endProps) => {
+                                    delete startProps.variant
+                                    delete startProps.helperText
 
-                                      delete endProps.variant
-                                      delete endProps.helperText
+                                    delete endProps.variant
+                                    delete endProps.helperText
 
-                                      return (
-                                        <>
-                                          <TextField classes={{ root: classes.dateInput }} {...startProps} />
-                                          <DateRangeDelimiter> to </DateRangeDelimiter>
-                                          <TextField classes={{ root: classes.dateInput }} {...endProps} />
-                                        </>
-                                      );
-                                    }}
-                                  />
-                                </LocalizationProvider>
+                                    return (
+                                      <>
+                                        <TextField classes={{ root: classes.dateInput }} {...startProps} />
+                                        <DateRangeDelimiter> to </DateRangeDelimiter>
+                                        <TextField classes={{ root: classes.dateInput }} {...endProps} />
+                                      </>
+                                    );
+                                  }}
+                                />*/}
                               </div>
 
                               <div style={{ display: 'flex', flex: '0.2', justifyContent: 'center' }}>

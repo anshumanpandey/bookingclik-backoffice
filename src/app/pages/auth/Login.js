@@ -7,10 +7,11 @@ import clsx from "clsx";
 import * as auth from "../../store/ducks/auth.duck";
 import { login, instagramLogin, facebookLogin } from "../../crud/auth.crud";
 import { Link } from "react-router-dom";
-
+import { useAppState } from '../AppState';
 
 function Login(props) {
   const { intl } = props;
+  const [, setError] = useAppState('error');
   const [loading, setLoading] = useState(false);
   const [loadingButtonStyle, setLoadingButtonStyle] = useState({
     paddingRight: "2.5rem"
@@ -82,6 +83,7 @@ function Login(props) {
               setTimeout(() => {
                 login(values.email, values.password)
                   .then(({ data: { token } }) => {
+                    setError(null)
                     disableLoading();
                     props.login(token);
                   })

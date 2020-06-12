@@ -54,7 +54,7 @@ const BUY_UNITS = {
 }
 
 function getSteps() {
-  return ['Select location and date', 'Check Price', 'Pay!'];
+  return ['Date', 'Location', 'Review', 'Payment'];
 }
 
 function resolvePrice(amountToBuy, frequency, isAirport) {
@@ -118,12 +118,15 @@ const CreateLocationComponent = ({ handleClose }) => {
         return json;
       }, {})
       setPerCountry(list)
-      setCountryArray(Object.keys(list).sort(function (a, b) {
-        if (a < b) { return -1; }
-        if (a > b) { return 1; }
-        return 0;
-      }))
-      setSelectedCountry(Object.keys(list)[0])
+      const countryArr = Object.keys(list)
+        .sort((a, b) => {
+          const countryA = countries.find(i => i.code.toLocaleLowerCase() == a.toLocaleLowerCase())?.name
+          const countryB = countries.find(i => i.code.toLocaleLowerCase() == b.toLocaleLowerCase())?.name
+          return countryA.localeCompare(countryB)
+        })
+
+      setCountryArray(countryArr)
+      setSelectedCountry(countryArr[0])
     }
   }, [locationsReq.loading])
 
@@ -174,27 +177,27 @@ const CreateLocationComponent = ({ handleClose }) => {
                       return
                     }
                     if (array.some(i => i == 'ALL')) array = perCountry[selectedCountry]
-                    .filter(i => i.availableAmount != 0)
-                    .filter((location, index, arr) => {
-                      const isFilled = arr.some(i => {
-                        if (i.BannerPurchaseds.length == 0) {
-                          return false
-                        }
+                      .filter(i => i.availableAmount != 0)
+                      .filter((location, index, arr) => {
+                        const isFilled = arr.some(i => {
+                          if (i.BannerPurchaseds.length == 0) {
+                            return false
+                          }
 
-                        return i.BannerPurchaseds.some(purchasedBanner => {
-                          const availableFromDate = moment(purchasedBanner.availableFromDate)
-                          const availableToDate = moment(purchasedBanner.availableToDate)
-                          const isBetween = selectedDate[0].isBetween(availableFromDate, availableToDate, undefined, '[]') ||
-                            selectedDate[1].isBetween(availableFromDate, availableToDate, undefined, '[]');
-                          const isInside = availableFromDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]') ||
-                            availableToDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]');
-                          return (isBetween || isInside) && location.locationName == i.locationName
+                          return i.BannerPurchaseds.some(purchasedBanner => {
+                            const availableFromDate = moment(purchasedBanner.availableFromDate)
+                            const availableToDate = moment(purchasedBanner.availableToDate)
+                            const isBetween = selectedDate[0].isBetween(availableFromDate, availableToDate, undefined, '[]') ||
+                              selectedDate[1].isBetween(availableFromDate, availableToDate, undefined, '[]');
+                            const isInside = availableFromDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]') ||
+                              availableToDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]');
+                            return (isBetween || isInside) && location.locationName == i.locationName
+                          })
                         })
+
+                        return !isFilled
+
                       })
-
-                      return !isFilled
-
-                    })
                     if (array.some(i => i == 'NONE')) array = []
 
                     const map = new Map();
@@ -232,6 +235,51 @@ const CreateLocationComponent = ({ handleClose }) => {
                       <div>
                         {activeStep == 0 && (
                           <>
+                            <div style={{ marginBottom: '1rem' }}>
+                              <DesktopDateRangePicker
+                                className="date-range"
+                                inputFormat="DD-MM-YYYY"
+                                startText="From"
+                                endText="To"
+                                open={isSelectingDate}
+                                onChange={() => { }}
+                                onOpen={() => setIsSelectingDate(true)}
+                                value={selectedDate}
+                                disablePast={true}
+                                onAccept={(datePair) => {
+                                  arrayHelpers.form.values.selectedLocations.forEach((l, idx) => {
+                                    arrayHelpers.replace(idx, { ...l, fromDate: datePair[0] ? datePair[0] : null, toDate: datePair[1] ? datePair[1] : null })
+                                  })
+                                  handleDateChange(datePair)
+                                  if (datePair[0] !== null && datePair[1] !== null) {
+                                    setStepOneDone(true)
+                                  } else {
+                                    setStepOneDone(false)
+                                  }
+                                  setIsSelectingDate(false)
+                                }}
+                                renderInput={(startProps, endProps) => {
+                                  delete startProps.variant
+                                  delete startProps.helperText
+
+                                  delete endProps.variant
+                                  delete endProps.helperText
+
+                                  return (
+                                    <>
+                                      <TextField classes={{ root: classes.dateInput }} {...startProps} />
+                                      <DateRangeDelimiter> to </DateRangeDelimiter>
+                                      <TextField classes={{ root: classes.dateInput }} {...endProps} />
+                                    </>
+                                  );
+                                }}
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {activeStep == 1 && selectedDate[0] !== null && selectedDate[1] !== null && (
+                          <>
                             {locationsReq.error && <p>Could not load the resource</p>}
                             {locationsReq.loading && <CircularProgress />}
                             {perCountry && (
@@ -260,119 +308,81 @@ const CreateLocationComponent = ({ handleClose }) => {
                               </div>
                             )}
 
-                            {selectedCountry && (
-                              <div style={{ marginBottom: '1rem' }}>
-                                <DesktopDateRangePicker
-                                  className="date-range"
-                                  inputFormat="DD-MM-YYYY"
-                                  startText="From"
-                                  endText="To"
-                                  open={isSelectingDate}
-                                  onChange={() => { }}
-                                  onOpen={() => setIsSelectingDate(true)}
-                                  value={selectedDate}
-                                  disablePast={true}
-                                  onAccept={(datePair) => {
-                                    arrayHelpers.form.values.selectedLocations.forEach((l, idx) => {
-                                      arrayHelpers.replace(idx, { ...l, fromDate: datePair[0] ? datePair[0] : null, toDate: datePair[1] ? datePair[1] : null })
-                                    })
-                                    handleDateChange(datePair)
-                                    if (datePair[0] !== null && datePair[1] !== null && arrayHelpers.form.values.selectedLocations.length !== 0) {
-                                      setStepOneDone(true)
-                                    } else {
-                                      setStepOneDone(false)
-                                    }
-                                    setIsSelectingDate(false)
-                                  }}
-                                  renderInput={(startProps, endProps) => {
-                                    delete startProps.variant
-                                    delete startProps.helperText
-
-                                    delete endProps.variant
-                                    delete endProps.helperText
-
-                                    return (
-                                      <>
-                                        <TextField classes={{ root: classes.dateInput }} {...startProps} />
-                                        <DateRangeDelimiter> to </DateRangeDelimiter>
-                                        <TextField classes={{ root: classes.dateInput }} {...endProps} />
-                                      </>
-                                    );
-                                  }}
-                                />
-                              </div>
-                            )}
-
                             {selectedCountry && selectedDate[0] !== null && selectedDate[1] !== null && (
-                              <div style={{ marginBottom: '1rem' }}>
-                                <FormControl style={{ width: '100%' }}>
-                                  <InputLabel id="demo-mutiple-name-label">Locations</InputLabel>
-                                  <Select
-                                    labelId="demo-mutiple-name-label"
-                                    open={menuIsOpen}
-                                    onClose={() => setMenuOpen(false)}
-                                    onOpen={() => setMenuOpen(true)}
-                                    multiple
-                                    value={arrayHelpers.form.values.selectedLocations
-                                      .filter(i => i.availableAmount != 0)
-                                      .sort(function (a, b) {
-                                        if (a.locationName < b.locationName) { return -1; }
-                                        if (a.locationName > b.locationName) { return 1; }
-                                        return 0;
-                                      })}
-                                    input={<Input />}
-                                    renderValue={(selected) => selected.map(i => i.locationName).join(', ')}
-                                    onChange={(e, t) => {
-                                      onSelectChange(e.target.value, t)
-                                    }}
-                                  >
-                                    <MenuItem classes={{ root: classes.closeManuItem }} value={'CLOSE'} >
-                                      <ListItemText classes={{ root: classes.centeredMenuText }} primary={'X'} />
-                                    </MenuItem>
-                                    <MenuItem classes={{ root: classes.selectAllItem }} value={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'NONE' : 'ALL'} >
-                                      <ListItemText
-                                        primary={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'UNSELECT ALL' : 'SELECT ALL'}
-                                      />
-                                    </MenuItem>
-                                    {perCountry[selectedCountry]
-                                    .filter(i => i.availableAmount != 0)
-                                    .filter((location, index, arr) => {
-                                      const isFilled = arr.some(i => {
-                                        if (i.BannerPurchaseds.length == 0) {
-                                          return false
-                                        }
+                              <>
+                                <div style={{ marginBottom: '1rem' }}>
+                                  <FormControl style={{ width: '100%' }}>
+                                    <InputLabel id="demo-mutiple-name-label">Locations</InputLabel>
+                                    <Select
+                                      labelId="demo-mutiple-name-label"
+                                      open={menuIsOpen}
+                                      onClose={() => setMenuOpen(false)}
+                                      onOpen={() => setMenuOpen(true)}
+                                      multiple
+                                      value={arrayHelpers.form.values.selectedLocations
+                                        .filter(i => i.availableAmount != 0)
+                                        .sort(function (a, b) {
+                                          if (a.locationName < b.locationName) { return -1; }
+                                          if (a.locationName > b.locationName) { return 1; }
+                                          return 0;
+                                        })}
+                                      input={<Input />}
+                                      renderValue={(selected) => selected.map(i => i.locationName).join(', ')}
+                                      onChange={(e, t) => {
+                                        onSelectChange(e.target.value, t)
+                                      }}
+                                    >
+                                      <MenuItem classes={{ root: classes.closeManuItem }} value={'CLOSE'} >
+                                        <ListItemText classes={{ root: classes.centeredMenuText }} primary={'X'} />
+                                      </MenuItem>
+                                      <MenuItem classes={{ root: classes.selectAllItem }} value={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'NONE' : 'ALL'} >
+                                        <ListItemText
+                                          primary={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'UNSELECT ALL' : 'SELECT ALL'}
+                                        />
+                                      </MenuItem>
+                                      {perCountry[selectedCountry]
+                                        .sort((a, b) => a.locationName.localeCompare(b.locationName))
+                                        .filter(i => i.availableAmount != 0)
+                                        .filter((location, index, arr) => {
+                                          const isFilled = arr.some(i => {
+                                            if (i.BannerPurchaseds.length == 0) {
+                                              return false
+                                            }
 
-                                        return i.BannerPurchaseds.some(purchasedBanner => {
-                                          const availableFromDate = moment(purchasedBanner.availableFromDate)
-                                          const availableToDate = moment(purchasedBanner.availableToDate)
-                                          const isBetween = selectedDate[0].isBetween(availableFromDate, availableToDate, undefined, '[]') ||
-                                            selectedDate[1].isBetween(availableFromDate, availableToDate, undefined, '[]');
-                                          const isInside = availableFromDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]') ||
-                                            availableToDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]');
-                                          return (isBetween || isInside) && location.locationName == i.locationName
+                                            return i.BannerPurchaseds.some(purchasedBanner => {
+                                              const availableFromDate = moment(purchasedBanner.availableFromDate)
+                                              const availableToDate = moment(purchasedBanner.availableToDate)
+                                              const isBetween = selectedDate[0].isBetween(availableFromDate, availableToDate, undefined, '[]') ||
+                                                selectedDate[1].isBetween(availableFromDate, availableToDate, undefined, '[]');
+                                              const isInside = availableFromDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]') ||
+                                                availableToDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]');
+                                              return (isBetween || isInside) && location.locationName == i.locationName
+                                            })
+                                          })
+
+                                          return !isFilled
+
                                         })
-                                      })
+                                        .map((c, idx, arr) => {
+                                          return (
+                                            <MenuItem key={c.id} value={c}>
+                                              <Checkbox checked={arrayHelpers.form.values.selectedLocations.find(i => i.locationName == c.locationName) !== undefined} />
+                                              <ListItemText primary={c.locationName} />
+                                            </MenuItem>
+                                          );
+                                        })}
+                                    </Select>
+                                  </FormControl>
+                                </div>
 
-                                      return !isFilled
 
-                                    })
-                                    .map((c, idx, arr) => {
-                                      return (
-                                        <MenuItem key={c.id} value={c}>
-                                          <Checkbox checked={arrayHelpers.form.values.selectedLocations.find(i => i.locationName == c.locationName) !== undefined} />
-                                          <ListItemText primary={c.locationName} />
-                                        </MenuItem>
-                                      );
-                                    })}
-                                  </Select>
-                                </FormControl>
-                              </div>
+                              </>
                             )}
-
                           </>
                         )}
 
-                        {activeStep == 1 && selectedDate[0] !== null && selectedDate[1] !== null && arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
+
+                        {selectedDate[0] !== null && selectedDate[1] !== null && arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
                           const locationWithDatesAssigned = arr.filter(i => i.fromDate && i.toDate);
                           const isFilled = locationWithDatesAssigned.length != 0 && arr.filter(i => i.fromDate && i.toDate).some(i => {
                             if (i.BannerPurchaseds.length == 0) {
@@ -424,9 +434,9 @@ const CreateLocationComponent = ({ handleClose }) => {
 
                                       return (
                                         <>
-                                          <TextField classes={{ root: classes.dateInput }} {...startProps} disabled />
+                                          <TextField classes={{ root: classes.dateInput }} {...startProps} disabled contentEditable={false} />
                                           <DateRangeDelimiter> to </DateRangeDelimiter>
-                                          <TextField classes={{ root: classes.dateInput }} {...endProps} disabled />
+                                          <TextField classes={{ root: classes.dateInput }} {...endProps} disabled contentEditable={false} />
                                         </>
                                       );
                                     }}
@@ -450,7 +460,11 @@ const CreateLocationComponent = ({ handleClose }) => {
                           );
                         })}
 
-                        {activeStep == 2 && selectedDate[0] != null && selectedDate[1] != null
+
+
+
+
+                        {activeStep == 3 && selectedDate[0] != null && selectedDate[1] != null
                           && (
                             <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
                               <Paper className={classes.paper}>
@@ -464,7 +478,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                           )}
 
                         {
-                          activeStep == 2 &&
+                          activeStep == 3 &&
                           arrayHelpers.form.values.selectedLocations.length !== 0 &&
                           !arrayHelpers.form.values.selectedLocations.some(l => l.error) &&
                           selectedDate.every(i => i.fromDate !== null && i.toDate !== null)

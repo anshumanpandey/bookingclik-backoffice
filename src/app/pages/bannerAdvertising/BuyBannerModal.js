@@ -6,7 +6,6 @@ import {
 } from "@material-ui/core"
 import { makeStyles } from '@material-ui/core/styles';
 import { Formik, FieldArray, Field } from "formik";
-import { reportPayment } from "../../crud/pay.crud";
 import { getLocations, postBannerRecip } from "../../crud/banners.crud";
 import AxioHook from 'axios-hooks'
 import { PayPalButton } from "react-paypal-button-v2";
@@ -16,7 +15,6 @@ import * as auth from "../../store/ducks/auth.duck";
 import DataTable from 'react-data-table-component';
 import { DesktopDateRangePicker, DateRange, DateRangeDelimiter, LocalizationProvider } from "next-material-picker";
 import Stepper from '@material-ui/core/Stepper';
-import moment from 'moment'
 import DeleteIcon from '@material-ui/icons/Delete';
 
 
@@ -54,7 +52,15 @@ const BUY_UNITS = {
 }
 
 function getSteps() {
-  return ['Date', 'Location', 'Review', 'Payment'];
+  return ['Date', 'Location', 'Configure','Review','Payment'];
+}
+
+const STEPS_ENUM = {
+  DATE: 0,
+  LOCATION: 1,
+  CONFIGURE: 2,
+  REVIEW: 3,
+  PAYMENT: 4,
 }
 
 function resolvePrice(amountToBuy, frequency, isAirport) {
@@ -87,6 +93,7 @@ const CreateLocationComponent = ({ handleClose }) => {
   const [countryArr, setCountryArray] = useState([]);
   const [locationsReq, refetch] = AxioHook(getLocations())
   const [selectedLocations, setSelectedLocations] = useState([]);
+  const [activeStep, setActiveStep] = useState(STEPS_ENUM.DATE);
   const classes = useStyles();
 
   const [stepOneDone, setStepOneDone] = useState(false);
@@ -101,7 +108,6 @@ const CreateLocationComponent = ({ handleClose }) => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
 
   const [postReq, doPost] = AxioHook(postBannerRecip(), { manual: true })
@@ -171,6 +177,13 @@ const CreateLocationComponent = ({ handleClose }) => {
               <FieldArray
                 name="selectedLocations"
                 render={arrayHelpers => {
+                  const resolveNextButtonDisabledStatus = () => {
+                    if (activeStep == STEPS_ENUM.DATE && selectedDate[0] == null && selectedDate[1] == null)  return true
+                    if (activeStep == STEPS_ENUM.LOCATION && arrayHelpers.form.values.selectedLocations.length == 0)  return true
+                
+                    return false
+                  }
+
                   const onSelectChange = (array, extra) => {
                     if (array.some(i => i == 'CLOSE')) {
                       setMenuOpen(false)
@@ -178,26 +191,6 @@ const CreateLocationComponent = ({ handleClose }) => {
                     }
                     if (array.some(i => i == 'ALL')) array = perCountry[selectedCountry]
                       .filter(i => i.availableAmount != 0)
-                      .filter((location, index, arr) => {
-                        const isFilled = arr.some(i => {
-                          if (i.BannerPurchaseds.length == 0) {
-                            return false
-                          }
-
-                          return i.BannerPurchaseds.some(purchasedBanner => {
-                            const availableFromDate = moment(purchasedBanner.availableFromDate)
-                            const availableToDate = moment(purchasedBanner.availableToDate)
-                            const isBetween = selectedDate[0].isBetween(availableFromDate, availableToDate, undefined, '[]') ||
-                              selectedDate[1].isBetween(availableFromDate, availableToDate, undefined, '[]');
-                            const isInside = availableFromDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]') ||
-                              availableToDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]');
-                            return (isBetween || isInside) && location.locationName == i.locationName
-                          })
-                        })
-
-                        return !isFilled
-
-                      })
                     if (array.some(i => i == 'NONE')) array = []
 
                     const map = new Map();
@@ -233,7 +226,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                         ))}
                       </Stepper>
                       <div>
-                        {activeStep == 0 && (
+                        {activeStep == STEPS_ENUM.DATE && (
                           <>
                             <div style={{ marginBottom: '1rem' }}>
                               <DesktopDateRangePicker
@@ -278,7 +271,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                           </>
                         )}
 
-                        {activeStep == 1 && selectedDate[0] !== null && selectedDate[1] !== null && (
+                        {activeStep == STEPS_ENUM.LOCATION && selectedDate[0] !== null && selectedDate[1] !== null && (
                           <>
                             {locationsReq.error && <p>Could not load the resource</p>}
                             {locationsReq.loading && <CircularProgress />}
@@ -330,27 +323,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                                     pagination={true}
                                     data={perCountry[selectedCountry]
                                       .sort((a, b) => a.locationName.localeCompare(b.locationName))
-                                      .filter(i => i.availableAmount != 0)
-                                      .filter((location, index, arr) => {
-                                        const isFilled = arr.some(i => {
-                                          if (i.BannerPurchaseds.length == 0) {
-                                            return false
-                                          }
-
-                                          return i.BannerPurchaseds.some(purchasedBanner => {
-                                            const availableFromDate = moment(purchasedBanner.availableFromDate)
-                                            const availableToDate = moment(purchasedBanner.availableToDate)
-                                            const isBetween = selectedDate[0].isBetween(availableFromDate, availableToDate, undefined, '[]') ||
-                                              selectedDate[1].isBetween(availableFromDate, availableToDate, undefined, '[]');
-                                            const isInside = availableFromDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]') ||
-                                              availableToDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]');
-                                            return (isBetween || isInside) && location.locationName == i.locationName
-                                          })
-                                        })
-
-                                        return !isFilled
-
-                                      })}
+                                      .filter(i => i.availableAmount != 0)}
                                   />
                                 </div>
 
@@ -361,28 +334,8 @@ const CreateLocationComponent = ({ handleClose }) => {
                         )}
 
 
-                        {activeStep == 2 && selectedDate[0] !== null && selectedDate[1] !== null && arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
-                          const locationWithDatesAssigned = arr.filter(i => i.fromDate && i.toDate);
-                          const isFilled = locationWithDatesAssigned.length != 0 && arr.filter(i => i.fromDate && i.toDate).some(i => {
-                            if (i.BannerPurchaseds.length == 0) {
-                              return false
-                            }
-
-
-                            return i.BannerPurchaseds.some(purchasedBanner => {
-                              const availableFromDate = moment(purchasedBanner.availableFromDate)
-                              const availableToDate = moment(purchasedBanner.availableToDate)
-                              const isBetween = i.fromDate.isBetween(availableFromDate, availableToDate, undefined, '[]') ||
-                                i.toDate.isBetween(availableFromDate, availableToDate, undefined, '[]');
-                              const isInside = availableFromDate.isBetween(i.fromDate, i.toDate, undefined, '[]') ||
-                                availableToDate.isBetween(i.fromDate, i.toDate, undefined, '[]');
-                              return (isBetween || isInside) && location.locationName == i.locationName
-                            })
-                          })
-
+                        {activeStep == STEPS_ENUM.REVIEW && selectedDate[0] !== null && selectedDate[1] !== null && arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
                           if (location.availableAmount == 0) {
-                            return null
-                          } else if (isFilled) {
                             return null
                           } else {
                             if (location.error) arrayHelpers.replace(index, { ...location, error: false })
@@ -413,9 +366,9 @@ const CreateLocationComponent = ({ handleClose }) => {
 
                                       return (
                                         <>
-                                          <TextField classes={{ root: classes.dateInput }} {...startProps} disabled contentEditable={false} />
+                                          <Input classes={{ root: classes.dateInput }} {...startProps} disabled={true} contentEditable={false} />
                                           <DateRangeDelimiter> to </DateRangeDelimiter>
-                                          <TextField classes={{ root: classes.dateInput }} {...endProps} disabled contentEditable={false} />
+                                          <Input classes={{ root: classes.dateInput }} {...endProps} disabled={true} contentEditable={false} />
                                         </>
                                       );
                                     }}
@@ -443,7 +396,7 @@ const CreateLocationComponent = ({ handleClose }) => {
 
 
 
-                        {activeStep == 3 && selectedDate[0] != null && selectedDate[1] != null
+                        {activeStep == STEPS_ENUM.PAYMENT && selectedDate[0] != null && selectedDate[1] != null
                           && (
                             <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
                               <Paper className={classes.paper}>
@@ -457,7 +410,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                           )}
 
                         {
-                          activeStep == 3 &&
+                          activeStep == STEPS_ENUM.PAYMENT &&
                           arrayHelpers.form.values.selectedLocations.length !== 0 &&
                           !arrayHelpers.form.values.selectedLocations.some(l => l.error) &&
                           selectedDate.every(i => i.fromDate !== null && i.toDate !== null)
@@ -527,12 +480,12 @@ const CreateLocationComponent = ({ handleClose }) => {
 
                           <div style={{ display: 'flex', justifyContent: 'end' }}>
                             <Button
-                              disabled={activeStep === 0}
+                              disabled={activeStep === STEPS_ENUM.DATE}
                               onClick={handleBack}
                             >
                               Back
               </Button>
-                            <Button disabled={(activeStep == 0 && !stepOneDone) || activeStep == 3} variant="contained" color="primary" onClick={handleNext} >
+                            <Button disabled={resolveNextButtonDisabledStatus()} variant="contained" color="primary" onClick={handleNext} >
                               {activeStep === steps.length - 1 ? 'Pay' : 'Next'}
                             </Button>
                           </div>

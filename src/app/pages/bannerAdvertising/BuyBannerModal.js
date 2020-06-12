@@ -11,7 +11,8 @@ import { connect } from "react-redux";
 import countries from "../../widgets/countryDropdown/countries.json"
 import * as auth from "../../store/ducks/auth.duck";
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
+import { DesktopDateRangePicker, DateRange, DateRangeDelimiter, LocalizationProvider } from "next-material-picker";
+import MomentUtils from 'next-material-picker/adapter/moment';
 import moment from 'moment'
 import DeleteIcon from '@material-ui/icons/Delete';
 
@@ -37,6 +38,9 @@ const useStyles = makeStyles((theme) => ({
   centeredMenuText: {
     justifyContent: 'center',
     display: 'flex',
+  },
+  dateInput: {
+    width: '100%',
   },
 }));
 
@@ -68,6 +72,7 @@ function resolvePrice(amountToBuy, frequency, isAirport) {
 
 
 const CreateLocationComponent = ({ handleClose }) => {
+  const [isSelectingDate, setIsSelectingDate] = useState(false);
   const [menuIsOpen, setMenuOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [perCountry, setPerCountry] = useState(null);
@@ -158,7 +163,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                     const objs = []
                     Array.from(map.values())
                     .forEach((location) => {
-                      objs.push({ ...location, error: false, fromDate: moment().startOf('day'), toDate: moment().add('day', 1).endOf('day') })
+                      objs.push({ ...location, error: false, fromDate: null, toDate: null })
                     })
 
                     arrayHelpers.form.setFieldValue("selectedLocations", [...objs])
@@ -233,7 +238,8 @@ const CreateLocationComponent = ({ handleClose }) => {
                       {arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
                         let warning = null
                         let ocuppiedRange = []
-                        const isFilled = arr.some(i => {
+                        const locationWithDatesAssigned = arr.filter(i => i.fromDate && i.toDate);
+                        const isFilled = locationWithDatesAssigned.length != 0 && arr.filter(i => i.fromDate && i.toDate).some(i => {
                           if (i.BannerPurchaseds.length == 0) {
                             return false
                           }
@@ -277,40 +283,39 @@ const CreateLocationComponent = ({ handleClose }) => {
                               </div>
 
                               <div style={{ flex: 3, display: 'flex' }}>
-                                <MuiPickersUtilsProvider utils={MomentUtils}>
-                                  <DatePicker
-                                    style={{ flex: 1 }}
-                                    autoOk
-                                    label="From"
-                                    value={location.fromDate}
-                                    onChange={(d) => {
-                                      if (location.toDate.isBefore(d)) {
-                                        arrayHelpers.replace(index, location)
-                                      } else {
-                                        arrayHelpers.replace(index, { ...location, fromDate: d })
-                                      }
-                                    }}
-                                    disableToolbar
-                                    variant="inline"
-                                  />
+                              <LocalizationProvider dateAdapter={MomentUtils}>
+                              <DesktopDateRangePicker
+                              className="date-range"
+                              inputFormat="DD-MM-YYYY"
+      startText="From"
+      endText="To"
+      open={isSelectingDate}
+      onChange={() => {}}
+      onOpen={() => setIsSelectingDate(true)}
+      value={[location.fromDate,location.toDate]}
+      okText={"YEs"}
+      disablePast={true}
+      onAccept={(datePair) => {
+        arrayHelpers.replace(index, { ...location, fromDate: datePair[0] ? datePair[0]: location.fromDate, toDate: datePair[1] ? datePair[1]: location.toDate})
+        setIsSelectingDate(false)
+      }}
+      renderInput={(startProps, endProps) => {
+        delete startProps.variant
+        delete startProps.helperText
+        
+        delete endProps.variant
+        delete endProps.helperText
 
-                                  <DatePicker
-                                    style={{ flex: 1 }}
-                                    autoOk
-                                    label="To"
-                                    value={location.toDate}
-                                    onChange={(d) => {
-                                      if (location.fromDate.isAfter(d)) {
-                                        arrayHelpers.replace(index, location)
-                                      } else {
-                                        arrayHelpers.replace(index, { ...location, toDate: d })
-                                      }
-                                    }}
-                                    disableToolbar
-                                    variant="inline"
-                                  />
-
-                                </MuiPickersUtilsProvider>
+        return (
+          <>
+            <TextField classes={{ root: classes.dateInput }} {...startProps} />
+            <DateRangeDelimiter> to </DateRangeDelimiter>
+            <TextField classes={{ root: classes.dateInput }} {...endProps} />
+          </>
+        );
+      }}
+    />
+    </LocalizationProvider>
                               </div>
 
                               <div style={{ display: 'flex', flex: '0.2', justifyContent: 'center' }}>
@@ -318,7 +323,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                               </div>
 
                               <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center' }}>
-                                <h5 style={{ alignSelf: 'end', margin: 0 }}>{location.toDate.diff(location.fromDate, 'days') * location.price} £</h5>
+                                <h5 style={{ alignSelf: 'end', margin: 0 }}>{location.toDate && location.fromDate && location.toDate.diff(location.fromDate, 'days') * location.price} £</h5>
                               </div>
 
                               <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center', alignItems: 'end', cursor: 'pointer' }}>
@@ -331,7 +336,9 @@ const CreateLocationComponent = ({ handleClose }) => {
                         );
                       })}
 
-                      {arrayHelpers.form.values.selectedLocations.length !== 0 && (
+                      {arrayHelpers.form.values.selectedLocations.length !== 0 &&
+                      arrayHelpers.form.values.selectedLocations.every(i => i.fromDate !== null && i.toDate !== null)
+                      && (
                         <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
                           <Paper className={classes.paper}>
                             <div>{arrayHelpers.form.values.selectedLocations.length} locations selected</div>
@@ -343,7 +350,11 @@ const CreateLocationComponent = ({ handleClose }) => {
                         </div>
                       )}
 
-                      {arrayHelpers.form.values.selectedLocations.length !== 0 && !arrayHelpers.form.values.selectedLocations.some(l => l.error) && (
+                      {
+                      arrayHelpers.form.values.selectedLocations.length !== 0 &&
+                      !arrayHelpers.form.values.selectedLocations.some(l => l.error) &&
+                      arrayHelpers.form.values.selectedLocations.every(i => i.fromDate !== null && i.toDate !== null)
+                      && (
                         <PayPalButton
                           createOrder={(data, actions) => {
                             const totalToPay = arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {

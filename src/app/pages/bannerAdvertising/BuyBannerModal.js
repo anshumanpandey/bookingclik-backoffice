@@ -249,7 +249,9 @@ const CreateLocationComponent = ({ handleClose }) => {
                                     onClose={() => setMenuOpen(false)}
                                     onOpen={() => setMenuOpen(true)}
                                     multiple
-                                    value={arrayHelpers.form.values.selectedLocations.sort(function (a, b) {
+                                    value={arrayHelpers.form.values.selectedLocations
+                                      .filter(i => i.availableAmount != 0)
+                                      .sort(function (a, b) {
                                       if (a.locationName < b.locationName) { return -1; }
                                       if (a.locationName > b.locationName) { return 1; }
                                       return 0;

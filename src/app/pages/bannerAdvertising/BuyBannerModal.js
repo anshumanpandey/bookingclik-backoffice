@@ -13,7 +13,7 @@ import { PayPalButton } from "react-paypal-button-v2";
 import { connect } from "react-redux";
 import countries from "../../widgets/countryDropdown/countries.json"
 import * as auth from "../../store/ducks/auth.duck";
-import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
+import DataTable from 'react-data-table-component';
 import { DesktopDateRangePicker, DateRange, DateRangeDelimiter, LocalizationProvider } from "next-material-picker";
 import Stepper from '@material-ui/core/Stepper';
 import moment from 'moment'
@@ -311,68 +311,47 @@ const CreateLocationComponent = ({ handleClose }) => {
                             {selectedCountry && selectedDate[0] !== null && selectedDate[1] !== null && (
                               <>
                                 <div style={{ marginBottom: '1rem' }}>
-                                  <FormControl style={{ width: '100%' }}>
-                                    <InputLabel id="demo-mutiple-name-label">Locations</InputLabel>
-                                    <Select
-                                      labelId="demo-mutiple-name-label"
-                                      open={menuIsOpen}
-                                      onClose={() => setMenuOpen(false)}
-                                      onOpen={() => setMenuOpen(true)}
-                                      multiple
-                                      value={arrayHelpers.form.values.selectedLocations
-                                        .filter(i => i.availableAmount != 0)
-                                        .sort(function (a, b) {
-                                          if (a.locationName < b.locationName) { return -1; }
-                                          if (a.locationName > b.locationName) { return 1; }
-                                          return 0;
-                                        })}
-                                      input={<Input />}
-                                      renderValue={(selected) => selected.map(i => i.locationName).join(', ')}
-                                      onChange={(e, t) => {
-                                        onSelectChange(e.target.value, t)
-                                      }}
-                                    >
-                                      <MenuItem classes={{ root: classes.closeManuItem }} value={'CLOSE'} >
-                                        <ListItemText classes={{ root: classes.centeredMenuText }} primary={'X'} />
-                                      </MenuItem>
-                                      <MenuItem classes={{ root: classes.selectAllItem }} value={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'NONE' : 'ALL'} >
-                                        <ListItemText
-                                          primary={arrayHelpers.form.values.selectedLocations.length == perCountry[selectedCountry].length ? 'UNSELECT ALL' : 'SELECT ALL'}
-                                        />
-                                      </MenuItem>
-                                      {perCountry[selectedCountry]
-                                        .sort((a, b) => a.locationName.localeCompare(b.locationName))
-                                        .filter(i => i.availableAmount != 0)
-                                        .filter((location, index, arr) => {
-                                          const isFilled = arr.some(i => {
-                                            if (i.BannerPurchaseds.length == 0) {
-                                              return false
-                                            }
+                                  <DataTable
+                                    noHeader={true}
+                                    selectableRows={true}
+                                    onSelectedRowsChange={(e) => {
+                                      console.log(e)
+                                      onSelectChange(e.selectedRows)
+                                    }}
+                                    columns={[
+                                      {
+                                        name: 'Location Name',
+                                        selector: 'locationName',
+                                      },
+                                    ]}
+                                    selectableRowSelected={(row) => {
+                                      return arrayHelpers.form.values.selectedLocations.find(l => l.locationName == row.locationName) !== undefined
+                                    }}
+                                    pagination={true}
+                                    data={perCountry[selectedCountry]
+                                      .sort((a, b) => a.locationName.localeCompare(b.locationName))
+                                      .filter(i => i.availableAmount != 0)
+                                      .filter((location, index, arr) => {
+                                        const isFilled = arr.some(i => {
+                                          if (i.BannerPurchaseds.length == 0) {
+                                            return false
+                                          }
 
-                                            return i.BannerPurchaseds.some(purchasedBanner => {
-                                              const availableFromDate = moment(purchasedBanner.availableFromDate)
-                                              const availableToDate = moment(purchasedBanner.availableToDate)
-                                              const isBetween = selectedDate[0].isBetween(availableFromDate, availableToDate, undefined, '[]') ||
-                                                selectedDate[1].isBetween(availableFromDate, availableToDate, undefined, '[]');
-                                              const isInside = availableFromDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]') ||
-                                                availableToDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]');
-                                              return (isBetween || isInside) && location.locationName == i.locationName
-                                            })
+                                          return i.BannerPurchaseds.some(purchasedBanner => {
+                                            const availableFromDate = moment(purchasedBanner.availableFromDate)
+                                            const availableToDate = moment(purchasedBanner.availableToDate)
+                                            const isBetween = selectedDate[0].isBetween(availableFromDate, availableToDate, undefined, '[]') ||
+                                              selectedDate[1].isBetween(availableFromDate, availableToDate, undefined, '[]');
+                                            const isInside = availableFromDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]') ||
+                                              availableToDate.isBetween(selectedDate[0], selectedDate[1], undefined, '[]');
+                                            return (isBetween || isInside) && location.locationName == i.locationName
                                           })
-
-                                          return !isFilled
-
                                         })
-                                        .map((c, idx, arr) => {
-                                          return (
-                                            <MenuItem key={c.id} value={c}>
-                                              <Checkbox checked={arrayHelpers.form.values.selectedLocations.find(i => i.locationName == c.locationName) !== undefined} />
-                                              <ListItemText primary={c.locationName} />
-                                            </MenuItem>
-                                          );
-                                        })}
-                                    </Select>
-                                  </FormControl>
+
+                                        return !isFilled
+
+                                      })}
+                                  />
                                 </div>
 
 
@@ -382,7 +361,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                         )}
 
 
-                        {selectedDate[0] !== null && selectedDate[1] !== null && arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
+                        {activeStep == 2 && selectedDate[0] !== null && selectedDate[1] !== null && arrayHelpers.form.values.selectedLocations.map((location, index, arr) => {
                           const locationWithDatesAssigned = arr.filter(i => i.fromDate && i.toDate);
                           const isFilled = locationWithDatesAssigned.length != 0 && arr.filter(i => i.fromDate && i.toDate).some(i => {
                             if (i.BannerPurchaseds.length == 0) {
@@ -554,7 +533,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                             >
                               Back
               </Button>
-                            <Button disabled={(activeStep == 0 && !stepOneDone) || activeStep == 2} variant="contained" color="primary" onClick={handleNext} >
+                            <Button disabled={(activeStep == 0 && !stepOneDone) || activeStep == 3} variant="contained" color="primary" onClick={handleNext} >
                               {activeStep === steps.length - 1 ? 'Pay' : 'Next'}
                             </Button>
                           </div>

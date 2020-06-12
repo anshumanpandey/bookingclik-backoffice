@@ -320,7 +320,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                                     }}
                                     columns={[
                                       {
-                                        name: 'Location Name',
+                                        name: 'Select all',
                                         selector: 'locationName',
                                       },
                                     ]}

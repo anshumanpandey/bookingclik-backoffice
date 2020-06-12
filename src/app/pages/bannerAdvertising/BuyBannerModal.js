@@ -525,8 +525,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                             />
                           )}
 
-                        <div>
-                          <div>
+                          <div style={{ display: 'flex', justifyContent: 'end' }}>
                             <Button
                               disabled={activeStep === 0}
                               onClick={handleBack}
@@ -537,7 +536,6 @@ const CreateLocationComponent = ({ handleClose }) => {
                               {activeStep === steps.length - 1 ? 'Pay' : 'Next'}
                             </Button>
                           </div>
-                        </div>
 
                       </div>
                     </>

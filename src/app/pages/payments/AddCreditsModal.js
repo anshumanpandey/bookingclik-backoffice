@@ -49,7 +49,7 @@ const CreateLocationComponent = ({ handleClose, iataCode, fulfillUser, user }) =
                     </div>
                 </div>
 
-                <div style={{ pointerEvents: amount == 0 ? 'none' : 'unset'}}>
+                <div style={{ pointerEvents: amount == 0 ? 'none' : 'unset', width: '50%', margin: 'auto'}}>
                     <PayPalButton
                         amount={amount}
                         onSuccess={(details, data) => {

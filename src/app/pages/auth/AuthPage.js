@@ -67,7 +67,7 @@ export default function AuthPage() {
                   component={ForgotPassword}
                 />
                 <Redirect from="/auth" exact={true} to="/admin" />
-                <Redirect to="/admin" />
+                <Redirect to="/" />
               </Switch>
             </div>
           </div>

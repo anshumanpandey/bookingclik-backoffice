@@ -509,6 +509,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                           !arrayHelpers.form.values.selectedLocations.some(l => l.error) &&
                           selectedDate.every(i => i.fromDate !== null && i.toDate !== null)
                           && (
+                            <div style={{ width: '50%', margin: 'auto'}}>
                             <PayPalButton
                               createOrder={(data, actions) => {
                                 const totalToPay = arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
@@ -578,6 +579,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                                 currency: 'GBP'
                               }}
                             />
+                            </div>
                           )}
 
                         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

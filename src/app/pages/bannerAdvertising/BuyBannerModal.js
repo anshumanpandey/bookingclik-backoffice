@@ -108,27 +108,6 @@ const STEPS_ENUM = {
   PAYMENT: 4,
 }
 
-function resolvePrice(amountToBuy, frequency, isAirport) {
-  let total = 0;
-  if (frequency == BUY_UNITS.DAY) {
-    if (isAirport) total = amountToBuy * 5
-    if (!isAirport) total = amountToBuy * 2
-  }
-
-  if (frequency == BUY_UNITS.WEEK) {
-    if (isAirport) total = (amountToBuy * 5) * 7
-    if (!isAirport) total = (amountToBuy * 2) * 7
-  }
-
-  if (frequency == BUY_UNITS.MONTH) {
-    if (isAirport) total = (amountToBuy * 5) * 30
-    if (!isAirport) total = (amountToBuy * 2) * 30
-  }
-
-  return total
-}
-
-
 const CreateLocationComponent = ({ handleClose }) => {
   const [isSelectingDate, setIsSelectingDate] = useState(false);
   const [selectedDate, handleDateChange] = useState([null, null]);
@@ -499,7 +478,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                                 </div>
 
                                 <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center' }}>
-                                  <h5 style={{ alignSelf: 'end', margin: 0 }}>{location.toDate.diff(location.fromDate, 'days') * location.price} £</h5>
+                                  <h5 style={{ alignSelf: 'end', margin: 0 }}>{(location.toDate.diff(location.fromDate, 'days') + 1) * location.price} £</h5>
                                 </div>
 
                                 <div style={{ display: 'flex', flex: '0.3', justifyContent: 'center', alignItems: 'end', cursor: 'pointer' }}>
@@ -511,17 +490,13 @@ const CreateLocationComponent = ({ handleClose }) => {
                           );
                         })}
 
-
-
-
-
                         {activeStep == STEPS_ENUM.PAYMENT && selectedDate[0] != null && selectedDate[1] != null
                           && (
                             <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
                               <Paper className={classes.paper}>
                                 <div>{arrayHelpers.form.values.selectedLocations.length} locations selected</div>
                               Total: {arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                                  totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
+                                  totalToPay += (next.toDate.diff(next.fromDate, 'days') + 1) * next.price
                                   return totalToPay
                                 }, 0)} £
                           </Paper>
@@ -537,7 +512,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                             <PayPalButton
                               createOrder={(data, actions) => {
                                 const totalToPay = arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                                  totalToPay += next.toDate.diff(next.fromDate, 'days') * next.price
+                                  totalToPay += (next.toDate.diff(next.fromDate, 'days') + 1) * next.price
                                   return totalToPay
                                 }, 0).toFixed(2)
 
@@ -556,11 +531,11 @@ const CreateLocationComponent = ({ handleClose }) => {
                                     },
                                     items: arrayHelpers.form.values.selectedLocations.map((i) => {
                                       return {
-                                        name: `banner to be displayed on bookingclik.com during ${i.amount} ${i.frequency}s for ${i.locationName}`,
+                                        name: `banner to be displayed on bookingclik.com during ${selectedDate[1].diff(selectedDate[0], 'days') + 1 } days for ${i.locationName}`,
                                         quantity: 1,
                                         unit_amount: {
                                           currency_code: "GBP",
-                                          value: resolvePrice(i.amount, i.frequency, i.locationName.match(/(Airport)/)).toFixed(2),
+                                          value: (i.toDate.diff(i.fromDate, 'days') + 1) * i.price,
                                         },
                                       }
                                     }),
@@ -568,12 +543,6 @@ const CreateLocationComponent = ({ handleClose }) => {
                                 }
                                 return actions.order.create(payData);
                               }}
-                              amount={
-                                arrayHelpers.form.values.selectedLocations.reduce((totalToPay, next) => {
-                                  totalToPay += resolvePrice(next.amount, next.frequency, next.locationName.match(/(Airport)/))
-                                  return totalToPay
-                                }, 0)
-                              }
                               onSuccess={(details, paypalData) => {
                                 const formData = new FormData();
                                 formData.append("desktopImage", bannerImages[0]);

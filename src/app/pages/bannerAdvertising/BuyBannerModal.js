@@ -174,7 +174,7 @@ const CreateLocationComponent = ({ handleClose }) => {
           const countryB = countries.find(i => i.code.toLocaleLowerCase() == b.toLocaleLowerCase())?.name
           return countryA.localeCompare(countryB)
         })
-
+      setSelectedCountry('NONE')
       setCountryArray(countryArr)
     }
   }, [locationsReq.loading])
@@ -329,7 +329,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
                                     fullWidth
-                                    defaultValue={"NONE"}
+                                    value={selectedCountry}
                                     onChange={(e) => {
                                       if (e.target.value == 'NONE') {
                                         setSelectedCountry(null)
@@ -352,7 +352,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                               </div>
                             )}
 
-                            {selectedCountry && (
+                            {selectedCountry && selectedCountry !== 'NONE' && (
                               <>
                                 <div style={{ marginBottom: '1rem' }}>
                                   <DataTable

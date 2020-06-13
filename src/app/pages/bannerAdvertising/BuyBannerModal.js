@@ -16,8 +16,49 @@ import DataTable from 'react-data-table-component';
 import { DesktopDateRangePicker, DateRange, DateRangeDelimiter, LocalizationProvider } from "next-material-picker";
 import Stepper from '@material-ui/core/Stepper';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { DropzoneArea } from 'material-ui-dropzone'
 
+function createFormData(formData, key, data) {
+  if (data === Object(data) || Array.isArray(data)) {
+    for (var i in data) {
+      createFormData(formData, key + '[' + i + ']', data[i]);
+    }
+  } else {
+    formData.append(key, data);
+  }
+}
+
+function checkImageResolution(imgFile, imgWidth, imgHeight, imgTime) {
+  return new Promise((resolve, rejected) => {
+    var reader = new FileReader();
+
+    //Read the contents of Image File.
+    reader.readAsDataURL(imgFile);
+    reader.onload = function (e) {
+
+      //Initiate the JavaScript Image object.
+      var image = new Image();
+
+      //Set the Base64 string return from FileReader as source.
+      image.src = e.target.result;
+
+      //Validate the File Height and Width.
+      image.onload = function () {
+        var height = this.height;
+        var width = this.width;
+
+        if (height !== imgHeight) {
+          rejected(`Invalid height. ${imgTime} must of size ${imgHeight}`);
+          return
+        }
+        if (width !== imgWidth) {
+          rejected(`Invalid width. ${imgTime} must of size ${imgWidth}`);
+          return
+        }
+        resolve(true)
+      };
+    }
+  });
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -92,18 +133,16 @@ const CreateLocationComponent = ({ handleClose }) => {
   const [isSelectingDate, setIsSelectingDate] = useState(false);
   const [selectedDate, handleDateChange] = useState([null, null]);
   const [bannerImages, setBannersImages] = useState([null, null]);
-  const [menuIsOpen, setMenuOpen] = useState(false);
+  const [urlToOpen, setUrlToOpen] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [perCountry, setPerCountry] = useState(null);
   const [countryArr, setCountryArray] = useState([]);
   const [locationsReq, refetch] = AxioHook(getLocations())
   const [selectedLocations, setSelectedLocations] = useState([]);
-  const [activeStep, setActiveStep] = useState(STEPS_ENUM.CONFIGURE);
+  const [activeStep, setActiveStep] = useState(STEPS_ENUM.DATE);
   const classes = useStyles();
 
   const [stepOneDone, setStepOneDone] = useState(false);
-  const [stepTwo, setStepTwoDone] = useState(false);
-  const [stepThree, setStepThreeDone] = useState(false);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -164,7 +203,7 @@ const CreateLocationComponent = ({ handleClose }) => {
           handleBlur,
           handleSubmit,
           isSubmitting,
-          setFieldError
+          setStatus
         }) => (
             <form
               style={{ padding: '2rem' }}
@@ -185,15 +224,13 @@ const CreateLocationComponent = ({ handleClose }) => {
                   const resolveNextButtonDisabledStatus = () => {
                     if (activeStep == STEPS_ENUM.DATE && selectedDate[0] == null && selectedDate[1] == null) return true
                     if (activeStep == STEPS_ENUM.LOCATION && arrayHelpers.form.values.selectedLocations.length == 0) return true
+                    if (activeStep == STEPS_ENUM.CONFIGURE && (bannerImages[0] instanceof File == false || bannerImages[1] instanceof File == false || urlToOpen == null)) return true
+                    if (activeStep == STEPS_ENUM.PAYMENT) return true
 
                     return false
                   }
 
                   const onSelectChange = (array, extra) => {
-                    if (array.some(i => i == 'CLOSE')) {
-                      setMenuOpen(false)
-                      return
-                    }
                     if (array.some(i => i == 'ALL')) array = perCountry[selectedCountry]
                       .filter(i => i.availableAmount != 0)
                     if (array.some(i => i == 'NONE')) array = []
@@ -233,6 +270,11 @@ const CreateLocationComponent = ({ handleClose }) => {
                       <div>
                         {activeStep == STEPS_ENUM.DATE && (
                           <>
+                            <div role="alert" className="alert alert-secondary">
+                              <div className="alert-text">
+                                In order to buy banners please have 2 two banner images ready of size 160*600 and 1382*200
+                              </div>
+                            </div>
                             <div style={{ marginBottom: '1rem' }}>
                               <DesktopDateRangePicker
                                 className="date-range"
@@ -339,7 +381,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                         {activeStep == STEPS_ENUM.CONFIGURE && (
                           <div style={{ marginBottom: '1rem' }}>
                             <div style={{ flex: 1, display: 'flex', marginBottom: '1rem' }}>
-                              <TextField fullWidth style={{ alignSelf: 'end' }} label={'URL'} />
+                              <TextField fullWidth style={{ alignSelf: 'end' }} label={'URL'} value={urlToOpen} onChange={(e) => setUrlToOpen(e.target.value)} />
                             </div>
 
                             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
@@ -354,8 +396,12 @@ const CreateLocationComponent = ({ handleClose }) => {
                                   style={{ display: 'none' }}
                                   id="raised-button-file-desktop"
                                   onChange={({ target }) => {
-                                    console.log(target.files)
-                                    setBannersImages(p => [target.files[0], p[1]])
+                                    checkImageResolution(target.files[0], 160, 600, "Desktop Image")
+                                      .then(() => {
+                                        setBannersImages(p => [target.files[0], p[1]])
+                                        setStatus(null)
+                                      })
+                                      .catch(err => setStatus(err))
                                   }}
                                   type="file"
                                 />
@@ -364,7 +410,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                                     Upload desktop banner image
                                   </Button>
                                 </label>
-                                {bannerImages[0] && <img style={{ width: 300 }} src={URL.createObjectURL(bannerImages[0])} />}
+                                {bannerImages[0] && <img style={{ width: 64, height: 240 }} src={URL.createObjectURL(bannerImages[0])} />}
                               </div>
                               <div style={{
                                 display: 'flex',
@@ -377,8 +423,12 @@ const CreateLocationComponent = ({ handleClose }) => {
                                   style={{ display: 'none' }}
                                   id="raised-button-file-mobile"
                                   onChange={({ target }) => {
-                                    console.log(target.files)
-                                    setBannersImages(p => [p[0], target.files[0] ])
+                                    checkImageResolution(target.files[0], 1382, 200, "Mobile Image")
+                                      .then(() => {
+                                        setBannersImages(p => [p[0], target.files[0]])
+                                        setStatus(null)
+                                      })
+                                      .catch(err => setStatus(err))
                                   }}
                                   type="file"
                                 />
@@ -427,9 +477,9 @@ const CreateLocationComponent = ({ handleClose }) => {
 
                                       return (
                                         <>
-                                          <Input classes={{ root: classes.dateInput }} {...startProps} disabled={true} contentEditable={false} />
+                                          <Input classes={{ root: classes.dateInput }} {...startProps} disabled={true} />
                                           <DateRangeDelimiter> to </DateRangeDelimiter>
-                                          <Input classes={{ root: classes.dateInput }} {...endProps} disabled={true} contentEditable={false} />
+                                          <Input classes={{ root: classes.dateInput }} {...endProps} disabled={true} />
                                         </>
                                       );
                                     }}
@@ -517,17 +567,31 @@ const CreateLocationComponent = ({ handleClose }) => {
                                 }, 0)
                               }
                               onSuccess={(details, paypalData) => {
-                                const data = {
-                                  orderId: paypalData.orderID,
-                                  selectedLocations: arrayHelpers.form.values.selectedLocations.map((l) => {
+                                const formData = new FormData();
+                                formData.append("desktopImage", bannerImages[0]);
+                                formData.append("mobileImage", bannerImages[1]);
+
+                                formData.set("orderId", paypalData.orderID);
+                                formData.set("urlToOpen", urlToOpen);
+
+                                createFormData(
+                                  formData,
+                                  'selectedLocations',
+                                  arrayHelpers.form.values.selectedLocations.map((l) => {
                                     return {
                                       ...l,
                                       fromDate: l.fromDate.unix(),
-                                      toDate: l.toDate.unix()
-                                    }
-                                  }),
-                                };
-                                doPost({ data })
+                                      toDate: l.toDate.unix(),
+                                    };
+                                  })
+                                )
+
+                                doPost({
+                                  data: formData,
+                                  headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                  }
+                                })
                                   .then(() => {
                                     handleClose();
                                   })

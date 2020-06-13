@@ -574,7 +574,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                                   })
                               }}
                               options={{
-                                clientId: "AcDoYg60CAk48yIdgpLTKR8h99G9sdv_Xmdg8jzd8HTla_01m29inTc7d-kT5MdRwYcnpq5GmrdXbt4A",
+                                clientId: "AXrYo6CvTv__6wTusNmIaoQzvoBIt4wWb1QkScA-P62hAKfLQO_1nYI_uoShp-RlRyPITUVrRM-GgpnG",
                                 currency: 'GBP'
                               }}
                             />

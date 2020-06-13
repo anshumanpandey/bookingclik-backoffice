@@ -611,7 +611,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                             />
                           )}
 
-                        <div style={{ display: 'flex', justifyContent: 'end' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                           <Button
                             disabled={activeStep === STEPS_ENUM.DATE}
                             onClick={handleBack}

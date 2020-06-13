@@ -176,7 +176,6 @@ const CreateLocationComponent = ({ handleClose }) => {
         })
 
       setCountryArray(countryArr)
-      setSelectedCountry(countryArr[0])
     }
   }, [locationsReq.loading])
 
@@ -330,12 +329,17 @@ const CreateLocationComponent = ({ handleClose }) => {
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
                                     fullWidth
-                                    defaultValue={countryArr[0]}
+                                    defaultValue={"NONE"}
                                     onChange={(e) => {
+                                      if (e.target.value == 'NONE') {
+                                        setSelectedCountry(null)
+                                        return
+                                      }
                                       setSelectedCountry(e.target.value)
                                       arrayHelpers.form.setFieldValue("selectedLocations", [])
                                     }}
                                   >
+                                    <MenuItem value={'NONE'}>Please Select</MenuItem>
                                     {countryArr.length !== 0 && (
                                       countryArr
                                         .map(c => {
@@ -410,6 +414,7 @@ const CreateLocationComponent = ({ handleClose }) => {
                                     Upload desktop banner image
                                   </Button>
                                 </label>
+                                {!bannerImages[0] && <p>Select an 160x600 resolution image</p>}
                                 {bannerImages[0] && <img style={{ width: 64, height: 240 }} src={URL.createObjectURL(bannerImages[0])} />}
                               </div>
                               <div style={{
@@ -432,11 +437,14 @@ const CreateLocationComponent = ({ handleClose }) => {
                                   }}
                                   type="file"
                                 />
+                                <div>
                                 <label htmlFor="raised-button-file-mobile">
                                   <Button color={"primary"} variant="container" component="span">
                                     Upload mobile banner image
                                   </Button>
                                 </label>
+                                {!bannerImages[1] && <p>Select an 1382x200 resolution image</p>}
+                                </div>
                                 {bannerImages[1] && <img style={{ width: 300 }} src={URL.createObjectURL(bannerImages[1])} />}
                               </div>
                             </div>

@@ -54,6 +54,14 @@ export default {
         roles: ['super_admin'],
         desc: 'Map your codes to an IATA code'
       },
+      {
+        title: "Top Locations",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "top-locations",
+        roles: ['super_admin'],
+        desc: 'Map your codes to an IATA code'
+      },
     ]
   }
 };

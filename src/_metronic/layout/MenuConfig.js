@@ -55,21 +55,28 @@ export default {
         desc: 'Map your codes to an IATA code'
       },
       {
-        title: "Top Locations",
-        root: true,
-        icon: "flaticon2-architecture-and-city",
-        page: "top-locations",
+        title: "Website Settings",
+        bullet: "dot",
         roles: ['super_admin'],
-        desc: 'Map your codes to an IATA code'
-      },
-      {
-        title: "About",
-        root: true,
-        icon: "flaticon2-architecture-and-city",
-        page: "about",
-        roles: ['super_admin'],
-        desc: 'Map your codes to an IATA code'
-      },
+        submenu: [
+          {
+            title: "Top Locations",
+            root: true,
+            icon: "flaticon2-architecture-and-city",
+            page: "top-locations",
+            roles: ['super_admin'],
+            desc: 'Map your codes to an IATA code'
+          },
+          {
+            title: "About",
+            root: true,
+            icon: "flaticon2-architecture-and-city",
+            page: "about",
+            roles: ['super_admin'],
+            desc: 'Map your codes to an IATA code'
+          },
+        ]
+      }
     ]
   }
 };

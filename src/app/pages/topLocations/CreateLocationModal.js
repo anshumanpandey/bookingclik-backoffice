@@ -93,7 +93,7 @@ export const CreateLocationModal = ({ handleClose, location }) => {
 
                                 {values.imgPreview && (
                                     <div className="form-group">
-                                        <img style={{ width: 100, height: 100 }} src={values.imgPreview} />
+                                        <img style={{ width: 250 }} src={values.imgPreview} />
                                     </div>
                                 )}
 

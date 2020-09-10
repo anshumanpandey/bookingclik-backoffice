@@ -12,6 +12,7 @@ import Visitors from "../visitors"
 import BannerAdvertising from "../bannerAdvertising"
 import bannerMeta from "../bannerMeta"
 import topLocations from "../topLocations/TopLocations"
+import About from "../about/About"
 import Supplier from "../supplier"
 import { AddCreditsModal } from "../payments/AddCreditsModal"
 import { EditProfile } from "../supplier/EditProfile"
@@ -47,6 +48,7 @@ function HomePage({ user, menuConfig, fulfillUser }) {
     { path: "/visitors", component: Visitors },    
     { path: "/banner-meta", component: bannerMeta },
     { path: "/top-locations", component: topLocations },
+    { path: "/about", component: About },
   ]
 
   let defaultRoute = 'click';

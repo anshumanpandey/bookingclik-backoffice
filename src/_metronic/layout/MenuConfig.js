@@ -62,6 +62,14 @@ export default {
         roles: ['super_admin'],
         desc: 'Map your codes to an IATA code'
       },
+      {
+        title: "About",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "about",
+        roles: ['super_admin'],
+        desc: 'Map your codes to an IATA code'
+      },
     ]
   }
 };

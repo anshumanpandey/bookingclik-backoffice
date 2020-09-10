@@ -6,11 +6,13 @@ import { connect } from "react-redux";
 import { Button } from "@material-ui/core";
 import { CreateLocationModal } from "./CreateLocationModal";
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import { DeleteLocation } from "./DeleteLocation";
 
 function Clients({ user }) {
     const [displayModal, setDisplayModal] = useState(false);
     const [displayDeleteModal, setDisplayDeleteModal] = useState(false);
+    const [displayEditModal, setDisplayEditModal] = useState(false);
 
     const [clientsLocationReq, refetch] = AxioHook(getTopLocations())
 
@@ -35,14 +37,20 @@ function Clients({ user }) {
                     selector: 'name',
                 },
                 {
+                    name: 'Image',
+                    cell: (row) => <img style={{ width: 50, height: 50 }} src={row.imagePath} />,
+                },
+                {
+                    name: 'Edit',
+                    cell: (row) => <EditIcon style={{ cursor: "pointer" }} onClick={() => {
+                        setDisplayEditModal(row)
+                    }} />,
+                },
+                {
                     name: 'Delete',
                     cell: (row) => <DeleteIcon style={{ cursor: "pointer" }} onClick={() => {
                         setDisplayDeleteModal(row)
                     }} />,
-                },
-                {
-                    name: 'Image',
-                    cell: (row) => <img style={{ width: 50, height: 50 }} src={row.imagePath} />,
                 },
             ]}
         />
@@ -60,6 +68,10 @@ function Clients({ user }) {
             {BodyApproved}
             {displayModal && <CreateLocationModal refetch={refetch} handleClose={(reason) => {
                 setDisplayModal(false)
+                refetch();
+            }} />}
+            {displayEditModal && <CreateLocationModal location={displayEditModal} refetch={refetch} handleClose={(reason) => {
+                setDisplayEditModal(false)
                 refetch();
             }} />}
             {displayDeleteModal && <DeleteLocation location={displayDeleteModal} refetch={refetch} handleClose={(reason) => {

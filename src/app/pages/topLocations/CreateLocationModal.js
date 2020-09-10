@@ -6,7 +6,7 @@ import { Modal } from "react-bootstrap";
 import { Formik } from 'formik';
 import { saveTopLocation } from '../../crud/toplocations.crud';
 
-export const CreateLocationModal = ({ handleClose, iataCode, fulfillUser, user }) => {
+export const CreateLocationModal = ({ handleClose, location }) => {
     const [payReq, doSave] = AxioHook(saveTopLocation(), { manual: true })
 
     return (
@@ -16,7 +16,7 @@ export const CreateLocationModal = ({ handleClose, iataCode, fulfillUser, user }
             </Modal.Header>
             <Modal.Body>
                 <Formik
-                    initialValues={{ name: "", img: null }}
+                    initialValues={{ id: location?.id || undefined, name: location?.name || "", img: null, imgPreview: location?.imagePath || undefined }}
                     validate={values => {
                         const errors = {};
 
@@ -24,7 +24,7 @@ export const CreateLocationModal = ({ handleClose, iataCode, fulfillUser, user }
                             errors.name = "Required"
                         }
 
-                        if (!values.img) {
+                        if (!values.img && !values.imgPreview) {
                             errors.img = "Required"
                         }
 
@@ -33,6 +33,9 @@ export const CreateLocationModal = ({ handleClose, iataCode, fulfillUser, user }
                     onSubmit={(values, { setFieldValue, setSubmitting }) => {
 
                         const data = new FormData()
+                        if (values.id) {
+                            data.append("id", values.id)
+                        }
                         data.append("img", values.img)
                         data.append("name", values.name)
                         doSave({ data, headers: {'Content-Type': 'multipart/form-data' } })

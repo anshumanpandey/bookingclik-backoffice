@@ -37,16 +37,19 @@ function Clients({ user }) {
                     selector: 'name',
                 },
                 {
-                    name: 'Edit',
-                    cell: (row) => <EditIcon style={{ cursor: "pointer" }} onClick={() => {
-                        setDisplayEditModal(row)
-                    }} />,
-                },
-                {
-                    name: 'Delete',
-                    cell: (row) => <DeleteIcon style={{ cursor: "pointer" }} onClick={() => {
-                        setDisplayDeleteModal(row)
-                    }} />,
+                    name: 'Edit/Delete',
+                    cell: (row) => {
+                        return (
+                            <>
+                                <EditIcon style={{ cursor: "pointer" }} onClick={() => {
+                                    setDisplayEditModal(row)
+                                }} />
+                                <DeleteIcon style={{ cursor: "pointer" }} onClick={() => {
+                                    setDisplayDeleteModal(row)
+                                }} />
+                            </>
+                        );
+                    },
                 },
             ]}
         />

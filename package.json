@@ -110,6 +110,7 @@
     "serve": "^11.2.0",
     "socicon": "^3.0.5",
     "styled-components": "^5.1.0",
+    "throttle-debounce": "^2.3.0",
     "use-places-autocomplete": "^1.2.2",
     "validate-password": "^1.0.4",
     "xlsx": "^0.16.1",

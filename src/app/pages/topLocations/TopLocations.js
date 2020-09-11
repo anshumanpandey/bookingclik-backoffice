@@ -37,10 +37,6 @@ function Clients({ user }) {
                     selector: 'name',
                 },
                 {
-                    name: 'Image',
-                    cell: (row) => <img style={{ width: 50, height: 50 }} src={row.imagePath} />,
-                },
-                {
                     name: 'Edit',
                     cell: (row) => <EditIcon style={{ cursor: "pointer" }} onClick={() => {
                         setDisplayEditModal(row)

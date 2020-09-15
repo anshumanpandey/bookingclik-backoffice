@@ -23,12 +23,12 @@ export const CreateLocationModal = ({ handleClose, location }) => {
     const [lastReqToken, setLastReqToken] = useState(null)
 
     const [{ data, loading, error }, refetch] = normalAxios({
-        url: `https://grcgds.com/api/api/public/locationCodesBySupplier`,
+        url: `https://grcgds.com/api/public/locationCodesBySupplier`,
         method: 'POST'
     }, { manual: true })
 
     const [clientReq] = normalAxios({
-        url: `https://grcgds.com/api/api/public/suppliers`,
+        url: `https://grcgds.com/api/public/suppliers`,
         method: 'POST'
     })
 

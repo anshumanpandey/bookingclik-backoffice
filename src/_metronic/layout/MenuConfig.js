@@ -55,6 +55,14 @@ export default {
         desc: 'Map your codes to an IATA code'
       },
       {
+        title: "Location Review",
+        root: true,
+        icon: "flaticon2-architecture-and-city",
+        page: "valuatedLocations",
+        roles: ['super_admin'],
+        desc: 'Map your codes to an IATA code'
+      },
+      {
         title: "Website Settings",
         bullet: "dot",
         roles: ['super_admin'],
@@ -72,14 +80,6 @@ export default {
             root: true,
             icon: "flaticon2-architecture-and-city",
             page: "about",
-            roles: ['super_admin'],
-            desc: 'Map your codes to an IATA code'
-          },
-          {
-            title: "Valuated Locations",
-            root: true,
-            icon: "flaticon2-architecture-and-city",
-            page: "valuatedLocations",
             roles: ['super_admin'],
             desc: 'Map your codes to an IATA code'
           },

@@ -59,14 +59,14 @@ export default function AuthPage() {
 
             <div className="kt-grid__item kt-grid__item--fluid  kt-grid__item--order-tablet-and-mobile-1  kt-login__wrapper">
               <Switch>
-                <Redirect from="/logout" to={"/admin"} />
-                <Route path="/admin" component={Login} />
+                <Redirect from="/logout" to={"/"} />
+                <Route path="/" component={Login} />
                 <Route path="/auth/registration" component={Registration} />
                 <Route
                   path="/auth/forgot-password"
                   component={ForgotPassword}
                 />
-                <Redirect from="/auth" exact={true} to="/admin" />
+                <Redirect from="/auth" exact={true} to="/" />
                 <Redirect to="/" />
               </Switch>
             </div>

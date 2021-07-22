@@ -113,7 +113,7 @@
     "throttle-debounce": "^2.3.0",
     "use-places-autocomplete": "^1.2.2",
     "validate-password": "^1.0.4",
-    "xlsx": "^0.16.1",
+    "xlsx": "^0.17.0",
     "xml-formatter": "^2.0.1"
   },
   "devDependencies": {
